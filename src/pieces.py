@@ -26,6 +26,7 @@ class Pawn(Piece):
             return None
         
     #determine what square the pawn can move too and return as a list
+    #make this return possible moves
     def moves(self, board):
         moves = []
         
@@ -89,7 +90,7 @@ class Pawn(Piece):
         moves.extend(validCaptures)
         moves.extend(validEnpassant)
         #can this so the for loops append directly to moves but fine for now
-        print(moves)
+        return moves
         
         
     
