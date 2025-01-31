@@ -68,6 +68,33 @@ board.printBoardBlack();
 #example moves; pe4, Nf3, Nc3, be6, 
 #work on move translator
 
+#HOW MOVES WORK
+#PLAYER SAYS "PIECE""POSITION"
+#example: bf4
+#we are looking at the bishop piece and the move f4
+#first check if white has any bishop
+#next check the moves of whites bishops to see it any can move to f4
+#if the above are true, then we make the move, otherwise we throw an error
+
+
+#Also deal with special case where two of the same piece can go to the same place
+#and also case where 3 can
+#and 4 can
+
+#EX: player has a knight on c3 and g3 both can move to e4
+#so if the player says, Nd5, we should check to see if we get 2 moves back
+#and then return an error saying please specify which knight
+
+#BUT we now need to handle the proper notation to make this move
+#If knights are on the same row, move starts with column letter 
+#if knights are on same column, move starts with row number
+
+#Actually lets just not let the player move
+#set up logic for rest of pieces
+#and then just focus on making sure the bot makes one right move
+
+
+
 
 
 #Go through every piece that white has, put them all into this moves list
@@ -76,6 +103,8 @@ board.printBoardBlack();
 #moves = board.getPiece(pieceRow,pieceCol).moves(board.board)
 
 #BETTER WAY TO DO COORDINATE SYSTEM WHERE MOVES ARE SEEN 
+
+
 
 
 print(board.getPiece(2,1).moves(board.board))
