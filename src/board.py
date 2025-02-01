@@ -1,8 +1,12 @@
-from pieces import Pawn, King
+from pieces import Pawn, King, Knight
 
 class Board:
     def __init__(self):
        self.board = [[None for x in range(8)] for y in range(8)]
+       self.whitePieces = []
+       self.blackPieces = []
+       
+       
        #self.setupPieces()
     #def setupPieces(self):
         #self.board[0] = ["R","N","B","Q","K","B","N","R"]
@@ -31,7 +35,25 @@ class Board:
     def getPiece(self, row:int, col:int) -> str |None:
         return self.board[row][col]
     
-    def inBounds(row, col):
+    def getAllEnemyCapturableSquare(self, colour):
+        capturable = []
+        colourPieces = []
+        
+        if colour == 1:
+            colourPieces = self.blackPieces
+        else:
+            colourPieces = self.whitePieces
+        
+        
+        for capture in colourPieces:
+            if isinstance(capture, Pawn):
+                capturable.append(capture.capturables())
+            else:
+                capturable.append(capture.moves())
+                
+        return capturable
+    
+    def inBounds(row, col): #returns bool
         return 0 <= row <= 7 and 0 <= col <= 7
         
     #def movePiece(self, startx:int,starty:int, endx:int, endy:int):
@@ -63,15 +85,23 @@ class Board:
 
 board = Board()
 
-pieceRow = 0
-pieceCol = 4
+pieceRow = 2
+pieceCol = 2
 
-board.addPiece(King(1,pieceRow,pieceCol))
-board.getPiece(pieceRow,pieceCol).moves()
+board.addPiece(Knight(-1,0,4,board))
+board.addPiece(King(1,pieceRow,pieceCol,board))
+
+print("\nKnight Moves:")
+print(board.getPiece(0,4).moves())
+print("\nKing Moves:")
+print(board.getPiece(pieceRow,pieceCol).moves())
 
 
 print("\n WHITE VIEW\n")
 board.printBoardTesting();
+
+
+
 #print("\n BLACK VIEW\n")
 #board.printBoardBlack();
 
