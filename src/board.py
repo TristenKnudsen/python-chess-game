@@ -1,4 +1,4 @@
-from pieces import Pawn
+from pieces import Pawn, King
 
 class Board:
     def __init__(self):
@@ -21,6 +21,12 @@ class Board:
             formattedRow = [str(piece) if piece else "." for piece in c]
             print(f"{9 - row_num} {' '.join(formattedRow)}")        
         print("  a b c d e f g h")   
+    
+    def printBoardTesting(self):
+        for row_num, c in enumerate(self.board[::-1], start=1): 
+            formattedRow = [str(piece) if piece else "." for piece in c]
+            print(f"{8 - row_num} {' '.join(formattedRow)}")        
+        print("  0 1 2 3 4 5 6 7")   
             
     def getPiece(self, row:int, col:int) -> str |None:
         return self.board[row][col]
@@ -56,11 +62,18 @@ class Board:
 #create list to hold white pieces and black pieces
 
 board = Board()
-board.addPiece(Pawn(1,2,1))
+
+pieceRow = 0
+pieceCol = 4
+
+board.addPiece(King(1,pieceRow,pieceCol))
+board.getPiece(pieceRow,pieceCol).moves()
+
+
 print("\n WHITE VIEW\n")
-board.printBoardWhite();
-print("\n BLACK VIEW\n")
-board.printBoardBlack();
+board.printBoardTesting();
+#print("\n BLACK VIEW\n")
+#board.printBoardBlack();
 
 
 
@@ -107,4 +120,4 @@ board.printBoardBlack();
 
 
 
-print(board.getPiece(2,1).moves(board.board))
+

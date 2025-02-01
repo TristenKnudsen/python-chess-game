@@ -9,17 +9,16 @@ class Piece:
     
 
 class Pawn(Piece):
-    def __init__(self, colour: str, row: int ,col: int):
+    def __init__(self, colour: int, row: int ,col: int):
         super().__init__(colour,row,col)
         self.symbol = "P"
-        self.firstmove = False
+        self.firstmove = True
         self.potentialenPassant = False
-        
         
     def __repr__(self):
         return self.symbol.upper() if self.colour == 1 else self.symbol.lower()
         
-    def safeAccess(self, board, row, col):
+    def safeAccess(self, board, row, col): #Remove out of bounds moves
         try:
             return board[row][col]
         except IndexError:
@@ -89,8 +88,55 @@ class Pawn(Piece):
         moves.extend(validForward)
         moves.extend(validCaptures)
         moves.extend(validEnpassant)
-        #can this so the for loops append directly to moves but fine for now
         return moves
         
         
     
+
+class King(Piece):
+    def __init__(self, colour: str, row: int ,col: int):
+        super().__init__(colour,row,col)
+        self.symbol = "K"
+        self.inCheck = False
+        self.firstMove = True
+        self.castleKingside = True
+        self.castleQueenside = True 
+        # keep track of this through game manager
+        
+    def __repr__(self):
+        return self.symbol.upper() if self.colour == 1 else self.symbol.lower()
+        
+    def moves(self):
+        moves = []
+        current_row = self.row
+        current_col = self.col
+
+        # Generate all adjacent king moves (including current position)
+        for dr in [-1, 0, 1]:
+            for dc in [-1, 0, 1]:
+                # Skip the current position (no move)
+                if dr == 0 and dc == 0:
+                    continue
+                
+                new_row = current_row + dr
+                new_col = current_col + dc
+                
+                # Check if move is within board boundaries (0-7 for 8x8 board)
+                if 0 <= new_row < 8 and 0 <= new_col < 8:
+                    moves.append([new_row, new_col])
+        
+        #for i in range(3):
+        #    for q in range(3):
+        #        moves.append([row,col])
+        #        col += 1
+        #    col = self.col - 1
+         #   row -= 1
+        
+        print(moves)
+        
+        #validate moves
+        
+        
+
+
+        
