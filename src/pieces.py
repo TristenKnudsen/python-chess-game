@@ -17,6 +17,17 @@ class Piece:
             return self.board.board[row][col]
         except IndexError:
             return None
+            
+    def moves(self):
+        moves = []
+        possibleMoves = self.capturables()
+        for move in possibleMoves:
+            row, col = move
+            if self.safeAccess(row, col) is None:
+                moves.append(move)
+            elif self.safeAccess(row, col).colour != self.colour:
+                moves.append(move)
+        return moves
     
     def __repr__(self):
         return self.symbol.upper() if self.colour == 1 else self.symbol.lower()
@@ -99,7 +110,7 @@ class Pawn(Piece):
     
     #determine what square the pawn can move too and return as a list
     #make this return possible moves
-    def moves(self):
+    def pawnMoves(self):
         moves = []
         
         validForward = self.forwardMoves()
@@ -145,15 +156,20 @@ class King(Piece):
                     possibleMoves.append([new_row, new_col])
         #Right now moves are all the theoretical ways a king could move on an empty board
         
+        #ADD CASTLING
+        
         validMoves = []
         for move in possibleMoves:
             row,col = move
             piece = self.safeAccess(row, col)
             if piece is None:
                 validMoves.append(move)
-                
+            elif piece.colour != self.colour:
+                validMoves.append(move)
+        
         
         enemyCapturables = self.board.getAllEnemyCapturableSquare(self.colour)
+        #add check to make sure enemycapturables isnt empty or NoneType
         enemyCapturables = [i for sublist in enemyCapturables for i in sublist]
         
         
@@ -164,9 +180,6 @@ class King(Piece):
         #moves = [x for x in validMoves if x not in enemyCapturables]
         
         return moves
-        
-        
-        
 
 class Knight(Piece):
     def __init__(self, colour: int, row: int ,col: int, board):
@@ -174,8 +187,8 @@ class Knight(Piece):
         self.symbol = "N"
         self.firstmove = True
     
-    def moves(self):
-        possibleMoves = []
+    def capturables(self):
+        possibleCapturables = []
         current_row = self.row
         current_col = self.col
         knight_moves = [
@@ -189,6 +202,128 @@ class Knight(Piece):
 
             # Check if the move stays within board limits
             if 0 <= new_row < 8 and 0 <= new_col < 8:
-                possibleMoves.append([new_row, new_col])
+                possibleCapturables.append([new_row, new_col])
 
-        return possibleMoves
+        return possibleCapturables # returns moves in bounds
+    
+        
+class Rook(Piece):
+    def __init__(self, colour: int, row: int ,col: int, board):
+        super().__init__(colour,row,col,board)
+        self.symbol = "R"
+        self.firstmove = True
+        
+        
+        
+    def capturables(self):
+        row, col = self.row, self.col
+        capturables = []
+        
+        # Directions for the rook: (row change, col change)
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Right, Left, Down, Up
+        
+        for dr, dc in directions:
+            currentRow, currentCol = row, col
+            while True:
+                currentRow += dr
+                currentCol += dc
+                
+                # Check boundaries
+                if currentRow < 0 or currentRow > 7 or currentCol < 0 or currentCol > 7:
+                    break  # Stop if out of bounds
+                
+                square = self.safeAccess(currentRow, currentCol)
+                
+                if square is None:  # Empty square, add to capturables
+                    capturables.append([currentRow, currentCol])
+                else:  # Found a piece, capture and stop
+                    capturables.append([currentRow, currentCol])
+                    break  # Stop in this direction
+            
+        return capturables
+        
+        
+        
+class Bishop(Piece):
+    def __init__(self, colour: int, row: int ,col: int, board):
+        super().__init__(colour,row,col,board)
+        self.symbol = "B"
+        self.firstmove = True
+        
+    def capturables(self):
+        row, col = self.row, self.col
+        capturables = []
+        directions = [(1, 1), (-1, 1), (-1, -1), (1, -1)]  # Right, Left, Down, Up
+        
+        for dr, dc in directions:
+            currentRow, currentCol = row, col
+            while True:
+                currentRow += dr
+                currentCol += dc
+                
+                # Check boundaries
+                if currentRow < 0 or currentRow > 7 or currentCol < 0 or currentCol > 7:
+                    break  # Stop if out of bounds
+                
+                square = self.safeAccess(currentRow, currentCol)
+                
+                if square is None:  # Empty square, add to capturables
+                    capturables.append([currentRow, currentCol])
+                else:  # Found a piece, capture and stop
+                    capturables.append([currentRow, currentCol])
+                    break  # Stop in this direction
+        return capturables
+                    
+    
+        
+class Queen(Piece):
+    def __init__(self, colour: int, row: int ,col: int, board):
+        super().__init__(colour,row,col,board)
+        self.symbol = "Q"
+        self.firstmove = True
+        
+    def capturables(self):
+        row, col = self.row, self.col
+        capturables = []
+        directions = [(1, 1), (-1, 1), (-1, -1), (1, -1)]  # Right, Left, Down, Up
+        
+        for dr, dc in directions:
+            currentRow, currentCol = row, col
+            while True:
+                currentRow += dr
+                currentCol += dc
+                
+                # Check boundaries
+                if currentRow < 0 or currentRow > 7 or currentCol < 0 or currentCol > 7:
+                    break  # Stop if out of bounds
+                
+                square = self.safeAccess(currentRow, currentCol)
+                
+                if square is None:  # Empty square, add to capturables
+                    capturables.append([currentRow, currentCol])
+                else:  # Found a piece, capture and stop
+                    capturables.append([currentRow, currentCol])
+                    break  # Stop in this direction
+        
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Right, Left, Down, Up
+        
+        for dr, dc in directions:
+            currentRow, currentCol = row, col
+            while True:
+                currentRow += dr
+                currentCol += dc
+                
+                # Check boundaries
+                if currentRow < 0 or currentRow > 7 or currentCol < 0 or currentCol > 7:
+                    break  # Stop if out of bounds
+                
+                square = self.safeAccess(currentRow, currentCol)
+                
+                if square is None:  # Empty square, add to capturables
+                    capturables.append([currentRow, currentCol])
+                else:  # Found a piece, capture and stop
+                    capturables.append([currentRow, currentCol])
+                    break  # Stop in this direction
+                     
+        return capturables
+                    

@@ -1,4 +1,4 @@
-from pieces import Pawn, King, Knight
+from pieces import Pawn, King, Knight, Rook, Bishop, Queen
 
 class Board:
     def __init__(self):
@@ -47,9 +47,8 @@ class Board:
         
         for capture in colourPieces:
             if isinstance(capture, Pawn):
-                capturable.append(capture.capturables())
-            else:
-                capturable.append(capture.moves())
+                capturable.append(capture.pawnMoves())
+            capturable.append(capture.capturables())
                 
         return capturable
     
@@ -61,7 +60,7 @@ class Board:
     #    self.board[startx][starty] = None
     #    board.printBoard()
         
-    def movePiece(self, piece, move):
+    def movePiece(self, piece, move): #change this
         if isinstance(piece, Pawn):
             print("The piece is a Pawn!")
         else:
@@ -85,21 +84,25 @@ class Board:
 
 board = Board()
 
-pieceRow = 2
-pieceCol = 2
+pieceRow = 0
+pieceCol = 5
 
-board.addPiece(Knight(-1,0,4,board))
+board.addPiece(Queen(1,1,2,board))
+board.addPiece(Pawn(-1,1,6,board))
+#board.addPiece(Knight(-1,0,6,board))
+#board.addPiece(Pawn(-1,4,6,board))
 board.addPiece(King(1,pieceRow,pieceCol,board))
 
-print("\nKnight Moves:")
-print(board.getPiece(0,4).moves())
+print("\nBishop Moves:")
+print(board.getPiece(1,2).moves())
+print("\nBishop Capturables:")
+print(board.getPiece(1,2).capturables())
 print("\nKing Moves:")
 print(board.getPiece(pieceRow,pieceCol).moves())
 
 
 print("\n WHITE VIEW\n")
 board.printBoardTesting();
-
 
 
 #print("\n BLACK VIEW\n")
