@@ -1,31 +1,31 @@
 class Piece:
-    def __init__(self, colour: int, row :int, col:int, board):
+    def __init__(self, colour: int, row :int, col:int):
         self.colour = colour # 1 for white, -1 for black
         self.symbol = ""
         self.hasMoved = False
         self.row = row
         self.col = col
-        self.board = board
+        #self.board = board
         
-        if colour == 1:
-            board.whitePieces.append(self)
-        else:
-            board.blackPieces.append(self)
+        #if colour == 1:
+        #    board.whitePieces.append(self)
+        #elif colour == -1:
+        #    board.blackPieces.append(self)
     
-    def safeAccess(self, row, col): #Remove out of bounds moves
+    def safeAccess(self, row, col, board): #Remove out of bounds moves
         try:
-            return self.board.board[row][col]
+            return board.board[row][col]
         except IndexError:
             return None
             
-    def moves(self):
+    def moves(self, board):
         moves = []
         possibleMoves = self.capturables()
         for move in possibleMoves:
             row, col = move
-            if self.safeAccess(row, col) is None:
+            if self.safeAccess(row, col, board) is None:
                 moves.append(move)
-            elif self.safeAccess(row, col).colour != self.colour:
+            elif self.safeAccess(row, col, board).colour != self.colour:
                 moves.append(move)
         return moves
     
@@ -34,10 +34,10 @@ class Piece:
     
 
 class Pawn(Piece):
-    def __init__(self, colour: int, row: int ,col: int, board):
-        super().__init__(colour,row,col,board)
+    def __init__(self, colour: int, row: int ,col: int):
+        super().__init__(colour,row,col)
         self.symbol = "P"
-        self.firstmove = True
+        self.firstmove = False  
         self.potentialenPassant = False
         
         #used to make sure king is not walking through checks
@@ -84,14 +84,14 @@ class Pawn(Piece):
             if piece is None:
                 continue
             if piece.colour != self.colour and piece.potentialenPassant == True:
-                validEnpassant.append(capture)
-        return validEnpassant
+                validEnpassant.append(capture) #MUST FIX THIS, RIGHT NOW IT CAN JUST CAPTURE TO THE RIGHT
+        return validEnpassant#MAKE WORK SO CAPTURE GOES RIGHT OR LEFT AND UP LIKE A NORMAL CAPTURE
     
     def forwardMoves(self):
         if self.firstmove:
             forwardMove = [
                 [self.row + (1 * self.colour), self.col],
-                [self.row + 2 * self.colour ,self.col]
+                [self.row + (2 * self.colour) ,self.col]
             ]
         else:
             forwardMove = [[self.row + (1 * self.colour), self.col]]
@@ -102,7 +102,7 @@ class Pawn(Piece):
             row,col = move
             if row == 8 or row == -1:
                 break;
-            if self.board.board[row][col] != None:
+            if board.board[row][col] != None:
                 break;
             else:
                 validForward.append(move)
@@ -110,15 +110,12 @@ class Pawn(Piece):
     
     #determine what square the pawn can move too and return as a list
     #make this return possible moves
-    def pawnMoves(self):
+    def moves(self):
         moves = []
         
         validForward = self.forwardMoves()
         validCaptures = self.normalCaptures()
         validEnpassant = self.enPassantCaptures()
-        
-        
-        
         
         moves.extend(validForward)
         moves.extend(validCaptures)
@@ -126,8 +123,8 @@ class Pawn(Piece):
         return moves
         
 class King(Piece):
-    def __init__(self, colour: str, row: int ,col: int, board):
-        super().__init__(colour,row,col,board)
+    def __init__(self, colour: str, row: int ,col: int):
+        super().__init__(colour,row,col)
         self.symbol = "K"
         self.inCheck = False
         self.firstMove = True
@@ -135,28 +132,23 @@ class King(Piece):
         self.castleQueenside = False 
         # keep track of this through game manager
         
-        
-    def moves(self):
-        possibleMoves = []
-        current_row = self.row
-        current_col = self.col
-
-        # Generate all adjacent king moves (including current position)
+    def capturables(self):
+        row, col = self.row, self.col
+        capturables = []
         for dr in [-1, 0, 1]:
             for dc in [-1, 0, 1]:
-                # Skip the current position (no move)
                 if dr == 0 and dc == 0:
                     continue
                 
-                new_row = current_row + dr
-                new_col = current_col + dc
-                
-                # Check if move is within board boundaries (0-7 for 8x8 board)
-                if 0 <= new_row < 8 and 0 <= new_col < 8:
-                    possibleMoves.append([new_row, new_col])
-        #Right now moves are all the theoretical ways a king could move on an empty board
+                if 0 <= row + dr < 8 and 0 <= col + dc < 8:
+                    capturables.append([row + dr, col + dc])
+        return capturables
         
-        #ADD CASTLING
+       
+    def moves(self, board):
+        possibleMoves = []
+
+        possibleMoves = self.capturables()
         
         validMoves = []
         for move in possibleMoves:
@@ -167,10 +159,9 @@ class King(Piece):
             elif piece.colour != self.colour:
                 validMoves.append(move)
         
-        
         enemyCapturables = self.board.getAllEnemyCapturableSquare(self.colour)
         #add check to make sure enemycapturables isnt empty or NoneType
-        enemyCapturables = [i for sublist in enemyCapturables for i in sublist]
+        #enemyCapturables = [i for sublist in enemyCapturables for i in sublist]
         
         
         moves = []
@@ -182,8 +173,8 @@ class King(Piece):
         return moves
 
 class Knight(Piece):
-    def __init__(self, colour: int, row: int ,col: int, board):
-        super().__init__(colour,row,col,board)
+    def __init__(self, colour: int, row: int ,col: int):
+        super().__init__(colour,row,col)
         self.symbol = "N"
         self.firstmove = True
     
@@ -208,12 +199,10 @@ class Knight(Piece):
     
         
 class Rook(Piece):
-    def __init__(self, colour: int, row: int ,col: int, board):
-        super().__init__(colour,row,col,board)
+    def __init__(self, colour: int, row: int ,col: int):
+        super().__init__(colour,row,col)
         self.symbol = "R"
         self.firstmove = True
-        
-        
         
     def capturables(self):
         row, col = self.row, self.col
@@ -245,8 +234,8 @@ class Rook(Piece):
         
         
 class Bishop(Piece):
-    def __init__(self, colour: int, row: int ,col: int, board):
-        super().__init__(colour,row,col,board)
+    def __init__(self, colour: int, row: int ,col: int):
+        super().__init__(colour,row,col)
         self.symbol = "B"
         self.firstmove = True
         
@@ -277,8 +266,8 @@ class Bishop(Piece):
     
         
 class Queen(Piece):
-    def __init__(self, colour: int, row: int ,col: int, board):
-        super().__init__(colour,row,col,board)
+    def __init__(self, colour: int, row: int ,col: int):
+        super().__init__(colour,row,col)
         self.symbol = "Q"
         self.firstmove = True
         

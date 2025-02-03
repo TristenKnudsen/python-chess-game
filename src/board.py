@@ -5,14 +5,16 @@ class Board:
        self.board = [[None for x in range(8)] for y in range(8)]
        self.whitePieces = []
        self.blackPieces = []
+       #self.setupPieces()
        
        
        #self.setupPieces()
-    #def setupPieces(self):
-        #self.board[0] = ["R","N","B","Q","K","B","N","R"]
-        #for col in range(8): self.board[1][col] = Pawn("white",1,col)
-        #self.board[6] = ["p"]*8
-        #self.board[7] = ["r","n","b","q","k","b","n","r"]
+    def setupPieces(self): #Pawn(colour,0,col)
+        #self.board[0] = [Rook(1,0,0,self), Knight(1,0,1,self), Bishop(1,0,2,self), Queen(1,0,3,self), King(1,0,4,self), Bishop(1,0,5,self), Knight(1,0,6,self), Rook(1,0,7,self)]        
+        #self.board[0] = [Rook(1,0,0,self), Knight(1,0,1,self), Bishop(1,0,2,self), Queen(1,0,3,self), King(1,0,4,self), Bishop(1,0,5,self), Knight(1,0,6,self), Rook(1,0,7,self)]
+        for col in range(8): self.board[1][col] = Pawn(1,1,col,self)
+        for col in range(8): self.board[6][col] = Pawn(-1,1,col,self)
+        self.board[7] = [Rook(-1,0,0,self), Knight(-1,0,1,self), Bishop(-1,0,2,self), Queen(-1,0,3,self), King(-1,0,4,self), Bishop(-1,0,5,self), Knight(-1,0,6,self), Rook(-1,0,7,self)]
     def printBoardBlack(self):
         for row_num, c in enumerate(self.board, start=1): 
             formattedRow = [str(piece) if piece else "." for piece in c[::-1]]
@@ -43,72 +45,90 @@ class Board:
             colourPieces = self.blackPieces
         else:
             colourPieces = self.whitePieces
-        
-        
-        for capture in colourPieces:
-            if isinstance(capture, Pawn):
-                capturable.append(capture.pawnMoves())
-            capturable.append(capture.capturables())
+
+        for piece in colourPieces:
+            capturable.extend(piece.capturables())
                 
+        
+            
+        #for piece in colourPieces:
+        #    capturable.append(piece.capturables())
+            
         return capturable
     
     def inBounds(row, col): #returns bool
         return 0 <= row <= 7 and 0 <= col <= 7
         
-    #def movePiece(self, startx:int,starty:int, endx:int, endy:int):
-    #    self.board[endx][endy] = self.board[startx][starty]
-    #    self.board[startx][starty] = None
-    #    board.printBoard()
+    def movePiece(self, sRow:int,sCol:int, eRow:int, eCol:int):
+        target_piece = self.board[eRow][eCol]
+        if target_piece:
+            if target_piece.colour == 1:
+                self.whitePieces.remove(target_piece)
+            else:
+                self.blackPieces.remove(target_piece)
+        self.board[eRow][eCol] = self.board[sRow][sCol]
+        self.board[sRow][sCol] = None
+        self.board[eRow][eCol].row = eRow  
+        self.board[eRow][eCol].col = eCol
+        self.printBoardTesting()  
         
-    def movePiece(self, piece, move): #change this
-        if isinstance(piece, Pawn):
-            print("The piece is a Pawn!")
-        else:
-            print("The piece is not a Pawn.")
-        row, col = move
-        self.board[row][col] = piece
-        self.board[piece.row][piece.col] = None
-        piece.row = row
-        piece.col = col
+    #def movePiece(self, piece, move): #change this
+    #    NotImplementedError
     
-    
-        
-    #def movePiece1(self, sx,sy, ex,ey):
-    #    print(self.board[sx][sy].canMove(self.board, sx,sy, ex, ey))
-        
-    def addPiece(self,piece):
+    def addPiece(self,colour,piece):
+        if colour == 1:
+            self.whitePieces.append(piece)
+        elif colour == -1:
+            self.blackPieces.append(piece)
+            
         self.board[piece.row][piece.col] = piece
     
     
 #create list to hold white pieces and black pieces
 
-board = Board()
+board1 = Board()
 
 pieceRow = 0
 pieceCol = 5
 
-board.addPiece(Queen(1,1,2,board))
-board.addPiece(Pawn(-1,1,6,board))
-#board.addPiece(Knight(-1,0,6,board))
-#board.addPiece(Pawn(-1,4,6,board))
-board.addPiece(King(1,pieceRow,pieceCol,board))
-
-print("\nBishop Moves:")
-print(board.getPiece(1,2).moves())
-print("\nBishop Capturables:")
-print(board.getPiece(1,2).capturables())
-print("\nKing Moves:")
-print(board.getPiece(pieceRow,pieceCol).moves())
 
 
-print("\n WHITE VIEW\n")
-board.printBoardTesting();
+
+board1.addPiece(-1,Pawn(-1,3,3))
+#board1.addPiece(-1,Pawn(-1,4,2))
+#board1.addPiece(-1,Queen(-1,4,1))
+#board1.addPiece(1,King(1,3,3))
 
 
-#print("\n BLACK VIEW\n")
-#board.printBoardBlack();
 
 
+print("# of King moves" + str(len(board1.getPiece(3,3).moves())))
+
+#print("# of enemy queen moves" + str(len(board1.getPiece(4,1).moves(board1))))
+
+
+board1.printBoardTesting()
+
+while False:
+    print(board1.whitePieces[0].moves(board1))
+    sRow, sCol = list(map(int,(input("Enter Piece coor: ").split(","))))
+    
+    piece = board1.getPiece(sRow,sCol)
+    #print(len(piece.moves()))
+    if piece is None:
+        print("There is no piece on that square!")
+    elif len(piece.moves(board1)) == 0:
+        print("This piece has no moves")
+    else:
+        q=0
+        for move in piece.moves(board1):
+            print(str(0 + q) + ":" + str(move))
+            q += 1
+        userMoveNumber = int(input("select move number"))
+        eRow,eCol = piece.moves(board1)[userMoveNumber]
+        board1.movePiece(sRow,sCol,eRow,eCol)
+
+#board.movePiece()
 
 #move = input("Enter move: ")
 #example moves; pe4, Nf3, Nc3, be6, 
