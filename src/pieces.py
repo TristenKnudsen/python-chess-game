@@ -41,7 +41,7 @@ class Pawn(Piece):
         self.potentialenPassant = False
         
         #used to make sure king is not walking through checks
-    def capturables(self): #Returns a theoretical squares a pawn could capture
+    def capturables(self, board): #Returns a theoretical squares a pawn could capture
         possibleCaptures = [
             [self.row + self.colour, self.col + 1],
             [self.row + self.colour, self.col - 1]
@@ -54,7 +54,7 @@ class Pawn(Piece):
         ]
         return validCaptures
             
-    def normalCaptures(self): #Returns actual squares a pawn could capture
+    def normalCaptures(self, board): #Returns actual squares a pawn could capture
         captures = [
             [self.row + self.colour, self.col + 1],
             [self.row + self.colour, self.col - 1]
@@ -63,14 +63,14 @@ class Pawn(Piece):
         validCaptures = []
         for capture in captures:
             row,col = capture
-            piece = self.safeAccess(row, col)
+            piece = self.safeAccess(row, col, board)
             if piece is None:
                 continue
             if piece.colour != self.colour:
                 validCaptures.append(capture)
         return validCaptures
         
-    def enPassantCaptures(self): #Returns actual squares a pawn could capture
+    def enPassantCaptures(self, board): #Returns actual squares a pawn could capture
         enPassant = [
             [self.row,self.col + 1],
             [self.row,self.col - 1]
@@ -80,14 +80,14 @@ class Pawn(Piece):
         
         for capture in enPassant:
             row,col = capture
-            piece = self.safeAccess(row, col)
+            piece = self.safeAccess(row, col, board)
             if piece is None:
                 continue
             if piece.colour != self.colour and piece.potentialenPassant == True:
                 validEnpassant.append(capture) #MUST FIX THIS, RIGHT NOW IT CAN JUST CAPTURE TO THE RIGHT
         return validEnpassant#MAKE WORK SO CAPTURE GOES RIGHT OR LEFT AND UP LIKE A NORMAL CAPTURE
     
-    def forwardMoves(self):
+    def forwardMoves(self, board):
         if self.firstmove:
             forwardMove = [
                 [self.row + (1 * self.colour), self.col],
@@ -110,12 +110,12 @@ class Pawn(Piece):
     
     #determine what square the pawn can move too and return as a list
     #make this return possible moves
-    def moves(self):
+    def moves(self, board):
         moves = []
         
-        validForward = self.forwardMoves()
-        validCaptures = self.normalCaptures()
-        validEnpassant = self.enPassantCaptures()
+        validForward = self.forwardMoves(board)
+        validCaptures = self.normalCaptures(board)
+        validEnpassant = self.enPassantCaptures(board)
         
         moves.extend(validForward)
         moves.extend(validCaptures)
@@ -142,6 +142,7 @@ class King(Piece):
                 
                 if 0 <= row + dr < 8 and 0 <= col + dc < 8:
                     capturables.append([row + dr, col + dc])
+        #print(capturables)
         return capturables
         
        
@@ -153,13 +154,13 @@ class King(Piece):
         validMoves = []
         for move in possibleMoves:
             row,col = move
-            piece = self.safeAccess(row, col)
+            piece = self.safeAccess(row, col, board)
             if piece is None:
                 validMoves.append(move)
             elif piece.colour != self.colour:
                 validMoves.append(move)
         
-        enemyCapturables = self.board.getAllEnemyCapturableSquare(self.colour)
+        enemyCapturables = board.getAllEnemyCapturableSquare(self.colour, board)
         #add check to make sure enemycapturables isnt empty or NoneType
         #enemyCapturables = [i for sublist in enemyCapturables for i in sublist]
         
@@ -169,7 +170,7 @@ class King(Piece):
         moves = [move for move in validMoves if move not in enemyCapturables]
         
         #moves = [x for x in validMoves if x not in enemyCapturables]
-        
+        #print(moves)
         return moves
 
 class Knight(Piece):
@@ -271,7 +272,7 @@ class Queen(Piece):
         self.symbol = "Q"
         self.firstmove = True
         
-    def capturables(self):
+    def capturables(self, board):
         row, col = self.row, self.col
         capturables = []
         directions = [(1, 1), (-1, 1), (-1, -1), (1, -1)]  # Right, Left, Down, Up
@@ -286,7 +287,7 @@ class Queen(Piece):
                 if currentRow < 0 or currentRow > 7 or currentCol < 0 or currentCol > 7:
                     break  # Stop if out of bounds
                 
-                square = self.safeAccess(currentRow, currentCol)
+                square = self.safeAccess(currentRow, currentCol, board)
                 
                 if square is None:  # Empty square, add to capturables
                     capturables.append([currentRow, currentCol])
@@ -306,7 +307,7 @@ class Queen(Piece):
                 if currentRow < 0 or currentRow > 7 or currentCol < 0 or currentCol > 7:
                     break  # Stop if out of bounds
                 
-                square = self.safeAccess(currentRow, currentCol)
+                square = self.safeAccess(currentRow, currentCol, board)
                 
                 if square is None:  # Empty square, add to capturables
                     capturables.append([currentRow, currentCol])
@@ -315,4 +316,7 @@ class Queen(Piece):
                     break  # Stop in this direction
                      
         return capturables
-                    
+    
+    def moves(self, board):
+        return capturables(board)
+        

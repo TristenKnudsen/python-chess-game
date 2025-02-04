@@ -1,3 +1,3 @@
 #Chess Bot
-A Python-based chess bot projects
+A Python-based chess game project
 
