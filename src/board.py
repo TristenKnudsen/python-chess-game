@@ -5,9 +5,8 @@ class Board:
        self.board = [[None for x in range(8)] for y in range(8)]
        self.whitePieces = []
        self.blackPieces = []
-       #self.setupPieces()
        
-       
+
     def setupPieces(self): #Pawn(colour,0,col)
         #self.board[0] = [Rook(1,0,0,self), Knight(1,0,1,self), Bishop(1,0,2,self), Queen(1,0,3,self), King(1,0,4,self), Bishop(1,0,5,self), Knight(1,0,6,self), Rook(1,0,7,self)]        
         #self.board[0] = [Rook(1,0,0,self), Knight(1,0,1,self), Bishop(1,0,2,self), Queen(1,0,3,self), King(1,0,4,self), Bishop(1,0,5,self), Knight(1,0,6,self), Rook(1,0,7,self)]
@@ -19,8 +18,7 @@ class Board:
             formattedRow = [str(piece) if piece else "." for piece in c[::-1]]
             print(f"{row_num} {' '.join(formattedRow)}")  
         print("  " + "a b c d e f g h"[::-1])               
-        
-        
+    
     def printBoardWhite(self):
         for row_num, c in enumerate(self.board[::-1], start=1): 
             formattedRow = [str(piece) if piece else "." for piece in c]
@@ -32,7 +30,7 @@ class Board:
             formattedRow = [str(piece) if piece else "." for piece in c]
             print(f"{8 - row_num} {' '.join(formattedRow)}")        
         print("  0 1 2 3 4 5 6 7")   
-            
+        
     def getPiece(self, row:int, col:int) -> str |None:
         return self.board[row][col]
     
@@ -86,9 +84,19 @@ pieceCol = 5
 
 
 
-board1.addPiece(-1,Pawn(-1,3,3))
-board1.addPiece(1,King(1,3,4))
-board1.addPiece(-1,Queen(-1,3,5))
+board1.addPiece(1,Pawn(1,7,6))
+board1.addPiece(-1,King(-1,3,4))
+board1.addPiece(1,Bishop(1,5,2))
+board1.addPiece(1,Bishop(1,5,2))
+
+board1.addPiece(1,Rook(1,0,4))
+board1.addPiece(1,Rook(1,0,3))
+
+#board1.addPiece(1,Knight(1,0,6))
+
+print(len(board1.getPiece(5,2).capturables(board1)))
+for piece in board1.whitePieces:
+    print("# moves of Piece: ", piece, " : ", len(piece.moves(board1)))
 #board1.addPiece(-1,Pawn(-1,4,2))
 #board1.addPiece(-1,Queen(-1,4,1))
 #board1.addPiece(1,King(1,3,3))
@@ -96,9 +104,10 @@ board1.addPiece(-1,Queen(-1,3,5))
 
 
 
-#print("# of King moves" + str(len(board1.getPiece(3,4).moves(board1))))
-print("King moves:")
-print(board1.getPiece(3,4).moves(board1))
+print("# of King moves: " + str(len(board1.getPiece(3,4).moves(board1))))
+print("King moves: " + str(board1.getPiece(3,4).moves(board1)))
+#print("King moves:")
+#print(board1.getPiece(3,4).moves(board1))
 
 #print("# of enemy queen moves" + str(len(board1.getPiece(4,1).moves(board1))))
 
