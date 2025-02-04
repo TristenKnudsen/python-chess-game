@@ -3,9 +3,8 @@ from pieces import Pawn, King, Knight, Rook, Bishop, Queen
 class Board:
     def __init__(self):
        self.board = [[None for x in range(8)] for y in range(8)]
-       self.whitePieces = []
+       self.whitePiecesOnBoard = []
        self.blackPieces = []
-       #self.setupPieces()
        
        
     def setupPieces(self): #Pawn(colour,0,col)
