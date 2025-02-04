@@ -12,7 +12,7 @@ class Piece:
         #elif colour == -1:
         #    board.blackPieces.append(self)
     
-    def safeAccess(self, row, col, board): #Remove out of bounds moves
+    def safeAccess(self, row, col, board): #Make sure we are not 
         try:
             return board.board[row][col]
         except IndexError:
@@ -20,12 +20,15 @@ class Piece:
             
     def moves(self, board):
         moves = []
-        possibleMoves = self.capturables()
+        possibleMoves = self.capturables(board)
         for move in possibleMoves:
             row, col = move
-            if self.safeAccess(row, col, board) is None:
+            square = self.safeAccess(row, col, board)
+            if square is None:
                 moves.append(move)
-            elif self.safeAccess(row, col, board).colour != self.colour:
+            elif isinstance(square, King):
+                pass
+            elif square.colour != self.colour:
                 moves.append(move)
         return moves
     
@@ -179,8 +182,8 @@ class Knight(Piece):
         self.symbol = "N"
         self.firstmove = True
     
-    def capturables(self):
-        possibleCapturables = []
+    def capturables(self, board):
+        capturables = []
         current_row = self.row
         current_col = self.col
         knight_moves = [
@@ -194,9 +197,9 @@ class Knight(Piece):
 
             # Check if the move stays within board limits
             if 0 <= new_row < 8 and 0 <= new_col < 8:
-                possibleCapturables.append([new_row, new_col])
+                capturables.append([new_row, new_col])
 
-        return possibleCapturables # returns moves in bounds
+        return capturables # returns moves in bounds
     
         
 class Rook(Piece):
@@ -205,15 +208,16 @@ class Rook(Piece):
         self.symbol = "R"
         self.firstmove = True
         
-    def capturables(self):
+    def capturables(self, board):
         row, col = self.row, self.col
         capturables = []
         
         # Directions for the rook: (row change, col change)
-        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Right, Left, Down, Up
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]  
         
         for dr, dc in directions:
             currentRow, currentCol = row, col
+            foundKing = False
             while True:
                 currentRow += dr
                 currentCol += dc
@@ -222,11 +226,20 @@ class Rook(Piece):
                 if currentRow < 0 or currentRow > 7 or currentCol < 0 or currentCol > 7:
                     break  # Stop if out of bounds
                 
-                square = self.safeAccess(currentRow, currentCol)
+                square = self.safeAccess(currentRow, currentCol, board)
+                
+                if(foundKing):
+                    capturables.append([currentRow, currentCol])
+                    break
                 
                 if square is None:  # Empty square, add to capturables
                     capturables.append([currentRow, currentCol])
-                else:  # Found a piece, capture and stop
+                    #print(isinstance(square, King))
+                elif isinstance(square, King):
+                    #print("found king")
+                    capturables.append([currentRow, currentCol])
+                    foundKing= True
+                else: #found a different piece
                     capturables.append([currentRow, currentCol])
                     break  # Stop in this direction
             
@@ -240,12 +253,16 @@ class Bishop(Piece):
         self.symbol = "B"
         self.firstmove = True
         
-    def capturables(self):
+    def capturables(self, board):
         row, col = self.row, self.col
         capturables = []
-        directions = [(1, 1), (-1, 1), (-1, -1), (1, -1)]  # Right, Left, Down, Up
+        
+        
+        directions = [(1, 1), (-1, 1), (-1, -1), (1, -1)]  # diagonals
+        foundKing = False
         
         for dr, dc in directions:
+            foundKing = False
             currentRow, currentCol = row, col
             while True:
                 currentRow += dr
@@ -255,15 +272,23 @@ class Bishop(Piece):
                 if currentRow < 0 or currentRow > 7 or currentCol < 0 or currentCol > 7:
                     break  # Stop if out of bounds
                 
-                square = self.safeAccess(currentRow, currentCol)
+                square = self.safeAccess(currentRow, currentCol, board)
+                
+                if(foundKing):
+                    capturables.append([currentRow, currentCol])
+                    break
                 
                 if square is None:  # Empty square, add to capturables
                     capturables.append([currentRow, currentCol])
-                else:  # Found a piece, capture and stop
+                    #print(isinstance(square, King))
+                elif isinstance(square, King):
+                    capturables.append([currentRow, currentCol])
+                    foundKing= True
+                else: #found a different piece
                     capturables.append([currentRow, currentCol])
                     break  # Stop in this direction
-        return capturables
                     
+        return capturables
     
         
 class Queen(Piece):
@@ -275,9 +300,13 @@ class Queen(Piece):
     def capturables(self, board):
         row, col = self.row, self.col
         capturables = []
-        directions = [(1, 1), (-1, 1), (-1, -1), (1, -1)]  # Right, Left, Down, Up
+        
+        #DIAGONALS
+        directions = [(1, 1), (-1, 1), (-1, -1), (1, -1)]  # diagonals
+        
         
         for dr, dc in directions:
+            foundKing = False
             currentRow, currentCol = row, col
             while True:
                 currentRow += dr
@@ -289,16 +318,28 @@ class Queen(Piece):
                 
                 square = self.safeAccess(currentRow, currentCol, board)
                 
+                if(foundKing):
+                    capturables.append([currentRow, currentCol])
+                    break
+                
                 if square is None:  # Empty square, add to capturables
                     capturables.append([currentRow, currentCol])
-                else:  # Found a piece, capture and stop
+                    #print(isinstance(square, King))
+                elif isinstance(square, King):
+                    #print("found king")
+                    capturables.append([currentRow, currentCol])
+                    foundKing= True
+                else: #found a different piece
                     capturables.append([currentRow, currentCol])
                     break  # Stop in this direction
         
-        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]  # Right, Left, Down, Up
+        
+        ##HORZ VERT
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]  
         
         for dr, dc in directions:
             currentRow, currentCol = row, col
+            foundKing = False
             while True:
                 currentRow += dr
                 currentCol += dc
@@ -309,9 +350,18 @@ class Queen(Piece):
                 
                 square = self.safeAccess(currentRow, currentCol, board)
                 
+                if(foundKing):
+                    capturables.append([currentRow, currentCol])
+                    break
+                
                 if square is None:  # Empty square, add to capturables
                     capturables.append([currentRow, currentCol])
-                else:  # Found a piece, capture and stop
+                    #print(isinstance(square, King))
+                elif isinstance(square, King):
+                    #print("found king")
+                    capturables.append([currentRow, currentCol])
+                    foundKing= True
+                else: #found a different piece
                     capturables.append([currentRow, currentCol])
                     break  # Stop in this direction
                      
