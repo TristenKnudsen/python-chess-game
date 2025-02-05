@@ -128,7 +128,7 @@ class King(Piece):
         self.castleQueenside = False 
         # keep track of this through game manager
         
-    def capturables(self):
+    def capturables(self, board):
         row, col = self.row, self.col
         capturables = []
         for dr in [-1, 0, 1]:
@@ -145,7 +145,7 @@ class King(Piece):
     def moves(self, board):
         possibleMoves = []
 
-        possibleMoves = self.capturables()
+        possibleMoves = self.capturables(board)
         
         validMoves = []
         for move in possibleMoves:
@@ -360,6 +360,4 @@ class Queen(Piece):
                      
         return capturables
     
-    def moves(self, board):
-        return capturables(board)
         

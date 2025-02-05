@@ -5,14 +5,39 @@ class Board:
        self.board = [[None for x in range(8)] for y in range(8)]
        self.whitePieces = []
        self.blackPieces = []
+       self.setupPieces()
        
 
-    def setupPieces(self): #Pawn(colour,0,col)
-        #self.board[0] = [Rook(1,0,0,self), Knight(1,0,1,self), Bishop(1,0,2,self), Queen(1,0,3,self), King(1,0,4,self), Bishop(1,0,5,self), Knight(1,0,6,self), Rook(1,0,7,self)]        
-        #self.board[0] = [Rook(1,0,0,self), Knight(1,0,1,self), Bishop(1,0,2,self), Queen(1,0,3,self), King(1,0,4,self), Bishop(1,0,5,self), Knight(1,0,6,self), Rook(1,0,7,self)]
-        for col in range(8): self.board[1][col] = Pawn(1,1,col,self)
-        for col in range(8): self.board[6][col] = Pawn(-1,1,col,self)
-        self.board[7] = [Rook(-1,0,0,self), Knight(-1,0,1,self), Bishop(-1,0,2,self), Queen(-1,0,3,self), King(-1,0,4,self), Bishop(-1,0,5,self), Knight(-1,0,6,self), Rook(-1,0,7,self)]
+    def setupPieces(self):
+        # Setting up White pieces
+        self.addPiece(1, Rook(1, 0, 0))
+        self.addPiece(1, Knight(1, 0, 1))
+        self.addPiece(1, Bishop(1, 0, 2))
+        self.addPiece(1, Queen(1, 0, 3))
+        self.addPiece(1, King(1, 0, 4))
+        self.addPiece(1, Bishop(1, 0, 5))
+        self.addPiece(1, Knight(1, 0, 6))
+        self.addPiece(1, Rook(1, 0, 7))
+        
+        # Placing White Pawns
+        for col in range(8):
+            self.addPiece(1, Pawn(1, 1, col))
+        
+        # Setting up Black pieces
+        self.addPiece(-1, Rook(-1, 7, 0))
+        self.addPiece(-1, Knight(-1, 7, 1))
+        self.addPiece(-1, Bishop(-1, 7, 2))
+        self.addPiece(-1, Queen(-1, 7, 3))
+        self.addPiece(-1, King(-1, 7, 4))
+        self.addPiece(-1, Bishop(-1, 7, 5))
+        self.addPiece(-1, Knight(-1, 7, 6))
+        self.addPiece(-1, Rook(-1, 7, 7))
+        
+        # Placing Black Pawns
+        for col in range(8):
+            self.addPiece(-1, Pawn(-1, 6, col))
+
+        
     def printBoardBlack(self):
         for row_num, c in enumerate(self.board, start=1): 
             formattedRow = [str(piece) if piece else "." for piece in c[::-1]]
@@ -84,19 +109,19 @@ pieceCol = 5
 
 
 
-board1.addPiece(1,Pawn(1,7,6))
-board1.addPiece(-1,King(-1,3,4))
-board1.addPiece(1,Bishop(1,5,2))
-board1.addPiece(1,Bishop(1,5,2))
+#board1.addPiece(1,Pawn(1,7,6))
+#board1.addPiece(-1,King(-1,3,4))
+#board1.addPiece(1,Bishop(1,5,2))
+#board1.addPiece(1,Bishop(1,5,2))
 
-board1.addPiece(1,Rook(1,0,4))
-board1.addPiece(1,Rook(1,0,3))
+#board1.addPiece(1,Rook(1,0,4))
+#board1.addPiece(1,Rook(1,0,3))
 
 #board1.addPiece(1,Knight(1,0,6))
 
-print(len(board1.getPiece(5,2).capturables(board1)))
-for piece in board1.whitePieces:
-    print("# moves of Piece: ", piece, " : ", len(piece.moves(board1)))
+#print(len(board1.getPiece(5,2).capturables(board1)))
+#for piece in board1.whitePieces:
+ #   print("# moves of Piece: ", piece, " : ", len(piece.moves(board1)))
 #board1.addPiece(-1,Pawn(-1,4,2))
 #board1.addPiece(-1,Queen(-1,4,1))
 #board1.addPiece(1,King(1,3,3))
@@ -104,8 +129,8 @@ for piece in board1.whitePieces:
 
 
 
-print("# of King moves: " + str(len(board1.getPiece(3,4).moves(board1))))
-print("King moves: " + str(board1.getPiece(3,4).moves(board1)))
+#print("# of King moves: " + str(len(board1.getPiece(3,4).moves(board1))))
+#print("King moves: " + str(board1.getPiece(3,4).moves(board1)))
 #print("King moves:")
 #print(board1.getPiece(3,4).moves(board1))
 
@@ -114,8 +139,7 @@ print("King moves: " + str(board1.getPiece(3,4).moves(board1)))
 
 board1.printBoardTesting()
 
-while False:
-    print(board1.whitePieces[0].moves(board1))
+while True:
     sRow, sCol = list(map(int,(input("Enter Piece coor: ").split(","))))
     
     piece = board1.getPiece(sRow,sCol)
@@ -129,7 +153,14 @@ while False:
         for move in piece.moves(board1):
             print(str(0 + q) + ":" + str(move))
             q += 1
-        userMoveNumber = int(input("select move number"))
+            
+        while True:
+            try:
+                userMoveNumber = int(input("Select move number: "))
+                break  # Exit the loop if conversion is successful
+            except ValueError or IndexError:
+                print("Invalid input. Please enter a valid integer.")
+        #userMoveNumber = int(input("select move number"))
         eRow,eCol = piece.moves(board1)[userMoveNumber]
         board1.movePiece(sRow,sCol,eRow,eCol)
 
