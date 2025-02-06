@@ -14,16 +14,30 @@ class Piece:
     def moves(self, board):
         moves = []
         possibleMoves = self.capturables(board)
-        for move in possibleMoves:
+        i = 0
+        while i < len(possibleMoves):
+            move = possibleMoves[i]
             row, col = move
             square = self.safeAccess(row, col, board)
             if square is None:
                 moves.append(move)
+                i += 1
             elif isinstance(square, King):
-                pass
+                i += 2  # Skip current and next move, works because we append one move after finding king in capturables, so this skips over it
             elif square.colour != self.colour:
                 moves.append(move)
-        return moves
+                i += 1
+            else:
+                i += 1  # Same color, not a King
+        
+        legalMoves = []
+        
+        for move in moves:
+            eRow, eCol = move
+            if board.checkIfLegalMove(self, eRow, eCol):
+                legalMoves.append(move)
+        
+        return legalMoves
     
     def __repr__(self):
         return self.symbol.upper() if self.colour == 1 else self.symbol.lower()
@@ -81,7 +95,7 @@ class Pawn(Piece):
         for capture in enPassant:
             row,col = capture
             piece = self.safeAccess(row, col, board)
-            if piece is None:
+            if not isinstance(piece, Pawn):
                 continue
             if piece.colour != self.colour and piece.potentialenPassant == True:
                 validEnpassant.append(capture) #MUST FIX THIS, RIGHT NOW IT CAN JUST CAPTURE TO THE RIGHT
@@ -181,24 +195,22 @@ class Knight(Piece):
     
     def capturables(self, board):
         capturables = []
-        current_row = self.row
-        current_col = self.col
+        currentRow = self.row
+        currentCol = self.col
         knight_moves = [
             (-2, -1), (-2, 1), (2, -1), (2, 1),  # Moves with 2-row jump
             (-1, -2), (-1, 2), (1, -2), (1, 2)   # Moves with 2-column jump
         ]
 
         for dr, dc in knight_moves:
-            new_row = current_row + dr
-            new_col = current_col + dc
+            newRow = currentRow + dr
+            newCol = currentCol + dc
 
             # Check if the move stays within board limits
-            if 0 <= new_row < 8 and 0 <= new_col < 8:
-                capturables.append([new_row, new_col])
+            if 0 <= newRow < 8 and 0 <= newCol < 8:
+                capturables.append([newRow, newCol])
 
         return capturables # returns moves in bounds
-    
-        
 class Rook(Piece):
     def __init__(self, colour: int, row: int ,col: int):
         super().__init__(colour,row,col)

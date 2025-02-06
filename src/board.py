@@ -9,8 +9,7 @@ class Board:
        self.whiteKing = King(1, 0, 4)
        self.blackKing = King(-1, 7, 4)
        self.setupPieces()
-       
-       
+
 
     def setupPieces(self):
         # Setting up White pieces
@@ -24,8 +23,8 @@ class Board:
         self.addPiece(1, Rook(1, 0, 7))
         
         # Placing White Pawns
-        for col in range(8):
-            self.addPiece(1, Pawn(1, 1, col))
+        #for col in range(8):
+        #    self.addPiece(1, Pawn(1, 1, col))
         
         # Setting up Black pieces
         self.addPiece(-1, Rook(-1, 7, 0))
@@ -79,16 +78,18 @@ class Board:
     
     def inBounds(row, col): #returns bool
         return 0 <= row <= 7 and 0 <= col <= 7
-        
-    def movePiece(self, sRow:int,sCol:int, eRow:int, eCol:int, pieceColour):
-        #CHECK IF MOVING PIECE RESULTS IN KING BEING PUT INTO CHECK
+       
+    def checkIfLegalMove(self, piece, eRow, eCol):
         kingCheckBoard = copy.deepcopy(self)  
+        pieceColour = piece.colour
+        sRow = piece.row
+        sCol = piece.col
+        
         if pieceColour == 1:
             colourKing = kingCheckBoard.whiteKing
         else:
             colourKing = kingCheckBoard.blackKing
             
-        #MAKE THE MOVE ON TEST BOARD
         faketarget_piece = kingCheckBoard.board[eRow][eCol]
         if faketarget_piece:
             if faketarget_piece.colour == 1:
@@ -101,13 +102,24 @@ class Board:
         kingCheckBoard.board[eRow][eCol].row = eRow  
         kingCheckBoard.board[eRow][eCol].col = eCol
         
-        newCapturables = kingCheckBoard.getAllEnemyCapturableSquare(1, kingCheckBoard)
+        newCapturables = kingCheckBoard.getAllEnemyCapturableSquare(colourKing.colour, kingCheckBoard)
         kingPos = colourKing.position()
+        
         if kingPos in newCapturables:
-            return print("Illegal move! King can be captured!")
-            
+            return False
         else:
-            print("King is safe")
+            return True
+       
+    def movePiece(self, piece, eRow, eCol):
+        pieceColour = piece.colour
+        sRow = piece.row
+        sCol = piece.col
+        if self.checkIfLegalMove(piece, eRow,eCol):
+            pass
+        else:
+            self.printBoardTesting()  
+            return print("Illegal move! King can be captured!")
+        
         
         
         target_piece = self.board[eRow][eCol]
@@ -130,8 +142,6 @@ class Board:
             self.blackPieces.append(piece)
             
         self.board[piece.row][piece.col] = piece
-    
-    
 #create list to hold white pieces and black pieces
 
 board1 = Board()
@@ -140,36 +150,6 @@ pieceRow = 0
 pieceCol = 5
 
 
-
-
-#board1.addPiece(1,Pawn(1,7,6))
-#board1.addPiece(-1,King(-1,3,4))
-#board1.addPiece(1,Bishop(1,5,2))
-#board1.addPiece(1,Bishop(1,5,2))
-
-#board1.addPiece(1,Rook(1,0,4))
-#board1.addPiece(1,Rook(1,0,3))
-
-#board1.addPiece(1,Knight(1,0,6))
-
-#print(len(board1.getPiece(5,2).capturables(board1)))
-#for piece in board1.whitePieces:
- #   print("# moves of Piece: ", piece, " : ", len(piece.moves(board1)))
-#board1.addPiece(-1,Pawn(-1,4,2))
-#board1.addPiece(-1,Queen(-1,4,1))
-#board1.addPiece(1,King(1,3,3))
-#print(board1.getAllEnemyCapturableSquare(1))
-
-
-
-#print("# of King moves: " + str(len(board1.getPiece(3,4).moves(board1))))
-#print("King moves: " + str(board1.getPiece(3,4).moves(board1)))
-#print("King moves:")
-#print(board1.getPiece(3,4).moves(board1))
-
-#print("# of enemy queen moves" + str(len(board1.getPiece(4,1).moves(board1))))
-
-#print(board1.whiteKing.moves(board1))
 board1.printBoardTesting()
 print(board1.whiteKing.position())
 
@@ -196,51 +176,6 @@ while True:
                 print("Invalid input. Please enter a valid integer.")
         #userMoveNumber = int(input("select move number"))
         eRow,eCol = piece.moves(board1)[userMoveNumber]
-        board1.movePiece(sRow,sCol,eRow,eCol, piece.colour)
-
-#board.movePiece()
-
-#move = input("Enter move: ")
-#example moves; pe4, Nf3, Nc3, be6, 
-#work on move translator
-
-#HOW MOVES WORK
-#PLAYER SAYS "PIECE""POSITION"
-#example: bf4
-#we are looking at the bishop piece and the move f4
-#first check if white has any bishop
-#next check the moves of whites bishops to see it any can move to f4
-#if the above are true, then we make the move, otherwise we throw an error
-
-
-#Also deal with special case where two of the same piece can go to the same place
-#and also case where 3 can
-#and 4 can
-
-#EX: player has a knight on c3 and g3 both can move to e4
-#so if the player says, Nd5, we should check to see if we get 2 moves back
-#and then return an error saying please specify which knight
-
-#BUT we now need to handle the proper notation to make this move
-#If knights are on the same row, move starts with column letter 
-#if knights are on same column, move starts with row number
-
-#Actually lets just not let the player move
-#set up logic for rest of pieces
-#and then just focus on making sure the bot makes one right move
-
-
-
-
-
-#Go through every piece that white has, put them all into this moves list
-#translate the moves list to chess notation
-#check if the move the user entered exists in the list, if so make the move, if not say invalid
-#moves = board.getPiece(pieceRow,pieceCol).moves(board.board)
-
-#BETTER WAY TO DO COORDINATE SYSTEM WHERE MOVES ARE SEEN 
-
-
-
-
-
+        board1.movePiece(piece,eRow,eCol)
+        
+        
