@@ -28,6 +28,10 @@ class Piece:
     def __repr__(self):
         return self.symbol.upper() if self.colour == 1 else self.symbol.lower()
     
+    def position(self):
+        return [self.row, self.col]
+    
+    
 
 class Pawn(Piece):
     def __init__(self, colour: int, row: int ,col: int):

@@ -1,11 +1,15 @@
 from pieces import Pawn, King, Knight, Rook, Bishop, Queen
+import copy
 
 class Board:
     def __init__(self):
        self.board = [[None for x in range(8)] for y in range(8)]
        self.whitePieces = []
        self.blackPieces = []
+       self.whiteKing = King(1, 0, 4)
+       self.blackKing = King(-1, 7, 4)
        self.setupPieces()
+       
        
 
     def setupPieces(self):
@@ -14,7 +18,7 @@ class Board:
         self.addPiece(1, Knight(1, 0, 1))
         self.addPiece(1, Bishop(1, 0, 2))
         self.addPiece(1, Queen(1, 0, 3))
-        self.addPiece(1, King(1, 0, 4))
+        self.addPiece(1, self.whiteKing)
         self.addPiece(1, Bishop(1, 0, 5))
         self.addPiece(1, Knight(1, 0, 6))
         self.addPiece(1, Rook(1, 0, 7))
@@ -28,14 +32,14 @@ class Board:
         self.addPiece(-1, Knight(-1, 7, 1))
         self.addPiece(-1, Bishop(-1, 7, 2))
         self.addPiece(-1, Queen(-1, 7, 3))
-        self.addPiece(-1, King(-1, 7, 4))
+        self.addPiece(-1, self.blackKing)
         self.addPiece(-1, Bishop(-1, 7, 5))
         self.addPiece(-1, Knight(-1, 7, 6))
         self.addPiece(-1, Rook(-1, 7, 7))
         
         # Placing Black Pawns
-        for col in range(8):
-            self.addPiece(-1, Pawn(-1, 6, col))
+        #for col in range(8):
+        #    self.addPiece(-1, Pawn(-1, 6, col))
 
         
     def printBoardBlack(self):
@@ -64,9 +68,9 @@ class Board:
         colourPieces = []
         
         if colour == 1:
-            colourPieces = self.blackPieces
+            colourPieces = board.blackPieces
         else:
-            colourPieces = self.whitePieces
+            colourPieces = board.whitePieces
 
         for piece in colourPieces:
             capturable.extend(piece.capturables(board))
@@ -76,11 +80,40 @@ class Board:
     def inBounds(row, col): #returns bool
         return 0 <= row <= 7 and 0 <= col <= 7
         
-    def movePiece(self, sRow:int,sCol:int, eRow:int, eCol:int):
+    def movePiece(self, sRow:int,sCol:int, eRow:int, eCol:int, pieceColour):
+        #CHECK IF MOVING PIECE RESULTS IN KING BEING PUT INTO CHECK
+        kingCheckBoard = copy.deepcopy(self)  
+        if pieceColour == 1:
+            colourKing = kingCheckBoard.whiteKing
+        else:
+            colourKing = kingCheckBoard.blackKing
+            
+        #MAKE THE MOVE ON TEST BOARD
+        faketarget_piece = kingCheckBoard.board[eRow][eCol]
+        if faketarget_piece:
+            if faketarget_piece.colour == 1:
+                kingCheckBoard.whitePieces.remove(faketarget_piece) 
+            else:
+                kingCheckBoard.blackPieces.remove(faketarget_piece)
+        
+        kingCheckBoard.board[eRow][eCol] = kingCheckBoard.board[sRow][sCol]
+        kingCheckBoard.board[sRow][sCol] = None
+        kingCheckBoard.board[eRow][eCol].row = eRow  
+        kingCheckBoard.board[eRow][eCol].col = eCol
+        
+        newCapturables = kingCheckBoard.getAllEnemyCapturableSquare(1, kingCheckBoard)
+        kingPos = colourKing.position()
+        if kingPos in newCapturables:
+            return print("Illegal move! King can be captured!")
+            
+        else:
+            print("King is safe")
+        
+        
         target_piece = self.board[eRow][eCol]
         if target_piece:
             if target_piece.colour == 1:
-                self.whitePieces.remove(target_piece)
+                self.whitePieces.remove(target_piece) #add to taken pieces
             else:
                 self.blackPieces.remove(target_piece)
         self.board[eRow][eCol] = self.board[sRow][sCol]
@@ -136,8 +169,9 @@ pieceCol = 5
 
 #print("# of enemy queen moves" + str(len(board1.getPiece(4,1).moves(board1))))
 
-
+#print(board1.whiteKing.moves(board1))
 board1.printBoardTesting()
+print(board1.whiteKing.position())
 
 while True:
     sRow, sCol = list(map(int,(input("Enter Piece coor: ").split(","))))
@@ -162,7 +196,7 @@ while True:
                 print("Invalid input. Please enter a valid integer.")
         #userMoveNumber = int(input("select move number"))
         eRow,eCol = piece.moves(board1)[userMoveNumber]
-        board1.movePiece(sRow,sCol,eRow,eCol)
+        board1.movePiece(sRow,sCol,eRow,eCol, piece.colour)
 
 #board.movePiece()
 
