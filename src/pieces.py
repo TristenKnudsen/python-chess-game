@@ -146,6 +146,12 @@ class King(Piece):
         self.castleQueenside = False 
         # keep track of this through game manager
         
+    def canCastleKingside():
+        return self.castleKingside
+    
+    def canCastleQueenside():
+        return self.castleQueenside
+        
     def capturables(self, board):
         row, col = self.row, self.col
         capturables = []
@@ -158,8 +164,46 @@ class King(Piece):
                     capturables.append([row + dr, col + dc])
         #print(capturables)
         return capturables
+    
+    def checkCastleMoves(self,board):
+        #add quick handle here for colour king
+        self.castleKingside = False
+        self.castleQueenside = False
+        castleMove = []
         
-       
+        if self.colour == 1:
+            kingsideRookSpot = board.getPiece(0,7)
+            queensideRookSpot = board.getPiece(0,0)
+            kingRow = 0
+        else:
+            kingsideRookSpot = board.getPiece(7,7)
+            queensideRookSpot = board.getPiece(7,0)
+            kingRow = 7
+            
+            
+        enemyCapturables = board.getAllEnemyCapturableSquare(self.colour, board)
+        
+        if not self.hasMoved:
+            if isinstance(kingsideRookSpot, Rook):
+                if not kingsideRookSpot.hasMoved:
+                    if not self.inCheck:
+                        if board.getPiece(kingRow,5) is None and board.getPiece(kingRow,6) is None:
+                            if [kingRow,5] not in enemyCapturables and [kingRow,6] not in enemyCapturables:
+                                print("Can Castle kingside")
+                                self.castleKingside = True
+                                castleMove.append(["castle" ,"kingside"])
+        if not self.hasMoved:
+            if isinstance(queensideRookSpot, Rook):
+                if not queensideRookSpot.hasMoved:
+                    if not self.inCheck:
+                        if board.getPiece(kingRow,2) is None and board.getPiece(kingRow,3) is None:
+                            if [kingRow,3] not in enemyCapturables and [kingRow,2] not in enemyCapturables:
+                                print("Can Castle queenside")
+                                self.castleQueenside = True
+                                castleMove.append(["castle" ,"queenside"])
+        return castleMove
+
+
     def moves(self, board):
         possibleMoves = []
 
@@ -180,11 +224,11 @@ class King(Piece):
         
         
         moves = []
-        #moves = [x for x in validMoves if x not in enemyCapturables]
         moves = [move for move in validMoves if move not in enemyCapturables]
         
-        #moves = [x for x in validMoves if x not in enemyCapturables]
-        #print(moves)
+        castleMoves = self.checkCastleMoves(board)
+        moves.extend(castleMoves)
+        
         return moves
 
 class Knight(Piece):

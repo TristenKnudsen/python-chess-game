@@ -14,12 +14,12 @@ class Board:
     def setupPieces(self):
         # Setting up White pieces
         self.addPiece(1, Rook(1, 0, 0))
-        self.addPiece(1, Knight(1, 0, 1))
-        self.addPiece(1, Bishop(1, 0, 2))
-        self.addPiece(1, Queen(1, 0, 3))
+        #self.addPiece(1, Knight(1, 0, 1))
+        #self.addPiece(1, Bishop(1, 0, 2))
+        #self.addPiece(1, Queen(1, 0, 3))
         self.addPiece(1, self.whiteKing)
-        self.addPiece(1, Bishop(1, 0, 5))
-        self.addPiece(1, Knight(1, 0, 6))
+        #self.addPiece(1, Bishop(1, 0, 5))
+        #self.addPiece(1, Knight(1, 0, 6))
         self.addPiece(1, Rook(1, 0, 7))
         
         # Placing White Pawns
@@ -28,9 +28,9 @@ class Board:
         
         # Setting up Black pieces
         self.addPiece(-1, Rook(-1, 7, 0))
-        self.addPiece(-1, Knight(-1, 7, 1))
-        self.addPiece(-1, Bishop(-1, 7, 2))
-        self.addPiece(-1, Queen(-1, 7, 3))
+        #self.addPiece(-1, Knight(-1, 7, 1))
+        #self.addPiece(-1, Bishop(-1, 7, 2))
+        #self.addPiece(-1, Queen(-1, 7, 3))
         self.addPiece(-1, self.blackKing)
         self.addPiece(-1, Bishop(-1, 7, 5))
         self.addPiece(-1, Knight(-1, 7, 6))
@@ -80,7 +80,7 @@ class Board:
         return 0 <= row <= 7 and 0 <= col <= 7
        
     def checkIfLegalMove(self, piece, eRow, eCol):
-        kingCheckBoard = copy.deepcopy(self)  
+        kingCheckBoard = copy.deepcopy(self)
         pieceColour = piece.colour
         sRow = piece.row
         sCol = piece.col
@@ -114,12 +114,30 @@ class Board:
         pieceColour = piece.colour
         sRow = piece.row
         sCol = piece.col
-        if self.checkIfLegalMove(piece, eRow,eCol):
-            pass
-        else:
-            self.printBoardTesting()  
-            return print("Illegal move! King can be captured!")
         
+        
+        if eRow != "castle": #only king can have eRow "Castle"
+            if self.checkIfLegalMove(piece, eRow,eCol):
+                pass
+            else:
+                self.printBoardTesting()  
+                return print("Illegal move! King can be captured!")
+        else:
+            print("Castled",eCol)
+            if eCol == "kingside":
+                eRow , eCol = piece.row,6 #KING move square and row col
+                self.executeMove(piece, eRow, eCol)
+                
+                #MOVE ROOK
+                self.executeMove(self.board[eRow][7], eRow, 5)
+                return
+            if eCol == "queenside":
+                eRow , eCol = piece.row,2 #KING move square and row col
+                self.executeMove(piece, eRow, eCol)
+                
+                #MOVE ROOK
+                self.executeMove(self.board[eRow][0], eRow, 3)
+                return    
         
         
         target_piece = self.board[eRow][eCol]
@@ -128,12 +146,18 @@ class Board:
                 self.whitePieces.remove(target_piece) #add to taken pieces
             else:
                 self.blackPieces.remove(target_piece)
-        self.board[eRow][eCol] = self.board[sRow][sCol]
-        self.board[sRow][sCol] = None
-        self.board[eRow][eCol].row = eRow  
-        self.board[eRow][eCol].col = eCol
-        self.printBoardTesting()  
+        
+        self.executeMove(piece,eRow,eCol)
     
+    def executeMove(self, piece, eRow, eCol):
+        sRow = piece.row
+        sCol = piece.col
+        self.board[eRow][eCol] = piece
+        self.board[sRow][sCol] = None
+        piece.row = eRow  
+        piece.col = eCol
+        piece.hasMoved = True
+        self.printBoardTesting()  
     
     def addPiece(self,colour,piece):
         if colour == 1:
@@ -151,11 +175,11 @@ pieceCol = 5
 
 
 board1.printBoardTesting()
-print(board1.whiteKing.position())
 
 while True:
+    #board1.whiteKing.checkCastle(board1)
+    board1.blackKing.checkCastleMoves(board1)
     sRow, sCol = list(map(int,(input("Enter Piece coor: ").split(","))))
-    
     piece = board1.getPiece(sRow,sCol)
     #print(len(piece.moves()))
     if piece is None:
