@@ -11,7 +11,7 @@ class Piece:
         except IndexError:
             return None
             
-    def moves(self, board):
+    def moves(self, board): #not for pawns
         moves = []
         possibleMoves = self.capturables(board)
         i = 0
@@ -51,7 +51,7 @@ class Pawn(Piece):
     def __init__(self, colour: int, row: int ,col: int):
         super().__init__(colour,row,col)
         self.symbol = "P"
-        self.firstmove = False  
+        #self.firstmove = True  
         self.potentialenPassant = False
         
         #used to make sure king is not walking through checks
@@ -69,10 +69,7 @@ class Pawn(Piece):
         return validCaptures
             
     def normalCaptures(self, board): #Returns actual squares a pawn could capture
-        captures = [
-            [self.row + self.colour, self.col + 1],
-            [self.row + self.colour, self.col - 1]
-        ]
+        captures = self.capturables(board)
         
         validCaptures = []
         for capture in captures:
@@ -98,11 +95,11 @@ class Pawn(Piece):
             if not isinstance(piece, Pawn):
                 continue
             if piece.colour != self.colour and piece.potentialenPassant == True:
-                validEnpassant.append(capture) #MUST FIX THIS, RIGHT NOW IT CAN JUST CAPTURE TO THE RIGHT
+                validEnpassant.append([row + self.colour, col]) #MUST FIX THIS, RIGHT NOW IT CAN JUST CAPTURE TO THE RIGHT
         return validEnpassant#MAKE WORK SO CAPTURE GOES RIGHT OR LEFT AND UP LIKE A NORMAL CAPTURE
     
     def forwardMoves(self, board):
-        if self.firstmove:
+        if not self.hasMoved:
             forwardMove = [
                 [self.row + (1 * self.colour), self.col],
                 [self.row + (2 * self.colour) ,self.col]

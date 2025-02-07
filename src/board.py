@@ -13,18 +13,19 @@ class Board:
 
     def setupPieces(self):
         # Setting up White pieces
-        self.addPiece(1, Rook(1, 0, 0))
+        #self.addPiece(1, Rook(1, 0, 0))
         #self.addPiece(1, Knight(1, 0, 1))
         #self.addPiece(1, Bishop(1, 0, 2))
         #self.addPiece(1, Queen(1, 0, 3))
         self.addPiece(1, self.whiteKing)
         #self.addPiece(1, Bishop(1, 0, 5))
         #self.addPiece(1, Knight(1, 0, 6))
-        self.addPiece(1, Rook(1, 0, 7))
+        #self.addPiece(1, Rook(1, 0, 7))
         
         # Placing White Pawns
         #for col in range(8):
         #    self.addPiece(1, Pawn(1, 1, col))
+        self.addPiece(1, Pawn(1, 4, 1))
         
         # Setting up Black pieces
         self.addPiece(-1, Rook(-1, 7, 0))
@@ -37,8 +38,8 @@ class Board:
         self.addPiece(-1, Rook(-1, 7, 7))
         
         # Placing Black Pawns
-        #for col in range(8):
-        #    self.addPiece(-1, Pawn(-1, 6, col))
+        for col in range(8):
+            self.addPiece(-1, Pawn(-1, 6, col))
 
         
     def printBoardBlack(self):
@@ -116,6 +117,7 @@ class Board:
         sCol = piece.col
         
         
+        
         if eRow != "castle": #only king can have eRow "Castle"
             if self.checkIfLegalMove(piece, eRow,eCol):
                 pass
@@ -138,6 +140,19 @@ class Board:
                 #MOVE ROOK
                 self.executeMove(self.board[eRow][0], eRow, 3)
                 return    
+        
+        if isinstance(piece, Pawn):
+            print("moving piece is pawn")
+            if [sRow + piece.colour, eCol] in piece.enPassantCaptures(self): 
+                print("Move is enpassant move")
+                #enPassantVictimPawn = self.board[sRow][eCol]
+                self.board[piece.row][eCol] = None #remove enpassant pawn
+                self.executeMove(piece, eRow, eCol)
+                return
+                  # Remove captured pawn
+            if(2 - abs(sRow - eRow)  == 0):
+                piece.potentialenPassant = True
+        
         
         
         target_piece = self.board[eRow][eCol]
@@ -178,10 +193,17 @@ board1.printBoardTesting()
 
 while True:
     #board1.whiteKing.checkCastle(board1)
+    #reset enPassantCaptures\
+    
+    # IMPLEMENT THIS TO ALTERNATE BETWEEN BLACK AND WHITE
+    # SO IF BLACK JUST MOVED, THEN WE DISABLE WHITES POTENTIAL ENPASSANTS
+    #for piece in board1.whitePieces: 
+    #    if isinstance(piece, Pawn):
+    #        piece.potentialenPassant == False
+    
     board1.blackKing.checkCastleMoves(board1)
     sRow, sCol = list(map(int,(input("Enter Piece coor: ").split(","))))
     piece = board1.getPiece(sRow,sCol)
-    #print(len(piece.moves()))
     if piece is None:
         print("There is no piece on that square!")
     elif len(piece.moves(board1)) == 0:
