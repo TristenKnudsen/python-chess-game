@@ -190,28 +190,33 @@ pieceCol = 5
 
 
 board1.printBoardTesting()
-
+turn = 1
 while True:
     #board1.whiteKing.checkCastle(board1)
     #reset enPassantCaptures\
     
-    # IMPLEMENT THIS TO ALTERNATE BETWEEN BLACK AND WHITE
-    # SO IF BLACK JUST MOVED, THEN WE DISABLE WHITES POTENTIAL ENPASSANTS
-    #for piece in board1.whitePieces: 
-    #    if isinstance(piece, Pawn):
-    #        piece.potentialenPassant == False
+    if turn == 1:
+        for piece in board1.whitePieces:
+            if isinstance(piece, Pawn):
+                    piece.potentialenPassant = False
+    else:
+        for piece in board1.blackPieces:
+                if isinstance(piece, Pawn):
+                        piece.potentialenPassant = False
     
     board1.blackKing.checkCastleMoves(board1)
     sRow, sCol = list(map(int,(input("Enter Piece coor: ").split(","))))
     piece = board1.getPiece(sRow,sCol)
     if piece is None:
         print("There is no piece on that square!")
+    elif piece.colour != turn:
+        print("Not your turn")
     elif len(piece.moves(board1)) == 0:
         print("This piece has no moves")
     else:
-        q=0
+        q = 0
         for move in piece.moves(board1):
-            print(str(0 + q) + ":" + str(move))
+            print(str(q) + ":" + str(move))
             q += 1
             
         while True:
@@ -220,8 +225,7 @@ while True:
                 break  # Exit the loop if conversion is successful
             except ValueError or IndexError:
                 print("Invalid input. Please enter a valid integer.")
-        #userMoveNumber = int(input("select move number"))
         eRow,eCol = piece.moves(board1)[userMoveNumber]
         board1.movePiece(piece,eRow,eCol)
-        
+        turn *= -1
         
