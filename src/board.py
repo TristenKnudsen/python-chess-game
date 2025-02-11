@@ -25,21 +25,21 @@ class Board:
         # Placing White Pawns
         #for col in range(8):
         #    self.addPiece(1, Pawn(1, 1, col))
-        self.addPiece(1, Pawn(1, 4, 1))
+        self.addPiece(1, Pawn(1, 6, 0))
         
         # Setting up Black pieces
-        self.addPiece(-1, Rook(-1, 7, 0))
+        #self.addPiece(-1, Rook(-1, 7, 0))
         #self.addPiece(-1, Knight(-1, 7, 1))
         #self.addPiece(-1, Bishop(-1, 7, 2))
         #self.addPiece(-1, Queen(-1, 7, 3))
         self.addPiece(-1, self.blackKing)
         self.addPiece(-1, Bishop(-1, 7, 5))
         self.addPiece(-1, Knight(-1, 7, 6))
-        self.addPiece(-1, Rook(-1, 7, 7))
+        #self.addPiece(-1, Rook(-1, 7, 7))
         
         # Placing Black Pawns
-        for col in range(8):
-            self.addPiece(-1, Pawn(-1, 6, col))
+        #for col in range(8):
+        #    self.addPiece(-1, Pawn(-1, 6, col))
 
         
     def printBoardBlack(self):
@@ -79,8 +79,8 @@ class Board:
     
     def inBounds(row, col): #returns bool
         return 0 <= row <= 7 and 0 <= col <= 7
-       
-    def checkIfLegalMove(self, piece, eRow, eCol):
+        
+    def checkIfLegalMove(self, piece, eRow, eCol): #simulate the move on a copy of the board
         kingCheckBoard = copy.deepcopy(self)
         pieceColour = piece.colour
         sRow = piece.row
@@ -152,10 +152,23 @@ class Board:
                   # Remove captured pawn
             if(2 - abs(sRow - eRow)  == 0):
                 piece.potentialenPassant = True
+            if eRow == 3.5 * (1 + piece.colour):
+                #promote pawn
+                promoteTo = input("PROMOTE PAWN: Queen, Rook, Bishop, Knight")
+                pieceList = self.whitePieces if piece.colour == 1 else self.blackPieces
+                
+                pieceList.remove(piece)
+                
+                piece = globals()[promoteTo](piece.colour, piece.row, piece.col)
+                
+                pieceList.append(piece)
+            
+            
+            #if white promote on row = 7
+            #if black promote on row = 0
         
         
-        
-        target_piece = self.board[eRow][eCol]
+        target_piece = self.board[eRow][eCol] #pawns remove themself from the pieces
         if target_piece:
             if target_piece.colour == 1:
                 self.whitePieces.remove(target_piece) #add to taken pieces
@@ -190,12 +203,13 @@ pieceCol = 5
 
 
 board1.printBoardTesting()
-turn = 1
+turnColour = 1
 while True:
-    #board1.whiteKing.checkCastle(board1)
-    #reset enPassantCaptures\
+    print(board1.whitePieces)
+    print(board1.blackPieces)
     
-    if turn == 1:
+    
+    if turnColour == 1:
         for piece in board1.whitePieces:
             if isinstance(piece, Pawn):
                     piece.potentialenPassant = False
@@ -209,7 +223,7 @@ while True:
     piece = board1.getPiece(sRow,sCol)
     if piece is None:
         print("There is no piece on that square!")
-    elif piece.colour != turn:
+    elif piece.colour != turnColour:
         print("Not your turn")
     elif len(piece.moves(board1)) == 0:
         print("This piece has no moves")
@@ -227,5 +241,5 @@ while True:
                 print("Invalid input. Please enter a valid integer.")
         eRow,eCol = piece.moves(board1)[userMoveNumber]
         board1.movePiece(piece,eRow,eCol)
-        turn *= -1
+        turnColour *= -1
         

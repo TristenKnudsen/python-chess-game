@@ -80,13 +80,12 @@ class Pawn(Piece):
             if piece.colour != self.colour:
                 validCaptures.append(capture)
         return validCaptures
-        
+
     def enPassantCaptures(self, board): #Returns actual squares a pawn could capture
         enPassant = [
             [self.row,self.col + 1],
             [self.row,self.col - 1]
         ]
-        
         validEnpassant=[]
         
         for capture in enPassant:
@@ -95,8 +94,8 @@ class Pawn(Piece):
             if not isinstance(piece, Pawn):
                 continue
             if piece.colour != self.colour and piece.potentialenPassant == True:
-                validEnpassant.append([row + self.colour, col]) #MUST FIX THIS, RIGHT NOW IT CAN JUST CAPTURE TO THE RIGHT
-        return validEnpassant#MAKE WORK SO CAPTURE GOES RIGHT OR LEFT AND UP LIKE A NORMAL CAPTURE
+                validEnpassant.append([row + self.colour, col]) 
+        return validEnpassant
     
     def forwardMoves(self, board):
         if not self.hasMoved:
