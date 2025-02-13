@@ -177,7 +177,7 @@ class King(Piece):
             kingRow = 7
             
             
-        enemyCapturables = board.getAllEnemyCapturableSquare(self.colour, board)
+        enemyCapturables = board.getAllEnemyCapturableSquare(self.colour)
         
         if not self.hasMoved:
             if isinstance(kingsideRookSpot, Rook):
@@ -214,7 +214,7 @@ class King(Piece):
             elif piece.colour != self.colour:
                 validMoves.append(move)
         
-        enemyCapturables = board.getAllEnemyCapturableSquare(self.colour, board)
+        enemyCapturables = board.getAllEnemyCapturableSquare(self.colour)
         #add check to make sure enemycapturables isnt empty or NoneType
         #enemyCapturables = [i for sublist in enemyCapturables for i in sublist]
         

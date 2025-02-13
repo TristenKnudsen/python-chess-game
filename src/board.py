@@ -13,14 +13,14 @@ class Board:
 
     def setupPieces(self):
         # Setting up White pieces
-        #self.addPiece(1, Rook(1, 0, 0))
+        self.addPiece(1, Rook(1, 0, 0))
         #self.addPiece(1, Knight(1, 0, 1))
         #self.addPiece(1, Bishop(1, 0, 2))
-        #self.addPiece(1, Queen(1, 0, 3))
+        self.addPiece(1, Queen(1, 0, 3))
         self.addPiece(1, self.whiteKing)
         #self.addPiece(1, Bishop(1, 0, 5))
         #self.addPiece(1, Knight(1, 0, 6))
-        #self.addPiece(1, Rook(1, 0, 7))
+        self.addPiece(1, Rook(1, 0, 7))
         
         # Placing White Pawns
         #for col in range(8):
@@ -63,19 +63,34 @@ class Board:
     def getPiece(self, row:int, col:int) -> str |None:
         return self.board[row][col]
     
-    def getAllEnemyCapturableSquare(self, colour, board):
+    def getAllEnemyCapturableSquare(self, colour):
         capturable = []
         colourPieces = []
         
         if colour == 1:
-            colourPieces = board.blackPieces
+            colourPieces = self.blackPieces
         else:
-            colourPieces = board.whitePieces
+            colourPieces = self.whitePieces
 
         for piece in colourPieces:
-            capturable.extend(piece.capturables(board))
+            capturable.extend(piece.capturables(self))
                 
         return capturable
+        
+    def getNumberOfMoves(self, colour):
+        moves = 0
+        colourPieces = []
+        
+        if colour == 1:
+            colourPieces = self.whitePieces
+        else:
+            colourPieces = self.blackPieces
+        
+        for piece in colourPieces:
+            moves += len(piece.moves(self))
+            
+        return moves
+        
     
     def inBounds(row, col): #returns bool
         return 0 <= row <= 7 and 0 <= col <= 7
@@ -103,7 +118,7 @@ class Board:
         kingCheckBoard.board[eRow][eCol].row = eRow  
         kingCheckBoard.board[eRow][eCol].col = eCol
         
-        newCapturables = kingCheckBoard.getAllEnemyCapturableSquare(colourKing.colour, kingCheckBoard)
+        newCapturables = kingCheckBoard.getAllEnemyCapturableSquare(colourKing.colour)
         kingPos = colourKing.position()
         
         if kingPos in newCapturables:
@@ -205,15 +220,26 @@ pieceCol = 5
 board1.printBoardTesting()
 turnColour = 1
 while True:
-    print(board1.whitePieces)
-    print(board1.blackPieces)
+    #print(board1.whitePieces)
+    #print(board1.blackPieces)
+    if board1.getNumberOfMoves(turnColour) == 0:
+        if not board1.colourKingInCheck:
+            #checkmate
+        else:
+            #stalemate
     
+    #check for checkmate and stalemate: 
+    #if len(board1.whitePieces.move) == 0: print("Black Checkmate")
+    
+    
+    #if len(board1.blackPieces) == 0: print("Black Checkmate")
     
     if turnColour == 1:
         for piece in board1.whitePieces:
             if isinstance(piece, Pawn):
                     piece.potentialenPassant = False
     else:
+        
         for piece in board1.blackPieces:
                 if isinstance(piece, Pawn):
                         piece.potentialenPassant = False
