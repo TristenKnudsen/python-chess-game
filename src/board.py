@@ -9,6 +9,7 @@ class Board:
        self.whiteKing = King(1, 0, 4)
        self.blackKing = King(-1, 7, 4)
        self.setupPieces()
+       #self.turnColour = 1
 
 
     def setupPieces(self):
@@ -16,11 +17,11 @@ class Board:
         self.addPiece(1, Rook(1, 0, 0))
         #self.addPiece(1, Knight(1, 0, 1))
         #self.addPiece(1, Bishop(1, 0, 2))
-        self.addPiece(1, Queen(1, 0, 3))
+        self.addPiece(1, Queen(1, 0, 2))
         self.addPiece(1, self.whiteKing)
         #self.addPiece(1, Bishop(1, 0, 5))
         #self.addPiece(1, Knight(1, 0, 6))
-        self.addPiece(1, Rook(1, 0, 7))
+        self.addPiece(1, Rook(1, 6, 7))
         
         # Placing White Pawns
         #for col in range(8):
@@ -33,8 +34,8 @@ class Board:
         #self.addPiece(-1, Bishop(-1, 7, 2))
         #self.addPiece(-1, Queen(-1, 7, 3))
         self.addPiece(-1, self.blackKing)
-        self.addPiece(-1, Bishop(-1, 7, 5))
-        self.addPiece(-1, Knight(-1, 7, 6))
+        #self.addPiece(-1, Bishop(-1, 7, 5))
+        #self.addPiece(-1, Knight(-1, 7, 6))
         #self.addPiece(-1, Rook(-1, 7, 7))
         
         # Placing Black Pawns
@@ -91,7 +92,6 @@ class Board:
             
         return moves
         
-    
     def inBounds(row, col): #returns bool
         return 0 <= row <= 7 and 0 <= col <= 7
         
@@ -191,6 +191,7 @@ class Board:
                 self.blackPieces.remove(target_piece)
         
         self.executeMove(piece,eRow,eCol)
+        #self.turnColour *= -1
     
     def executeMove(self, piece, eRow, eCol):
         sRow = piece.row
@@ -209,7 +210,21 @@ class Board:
             self.blackPieces.append(piece)
             
         self.board[piece.row][piece.col] = piece
-#create list to hold white pieces and black pieces
+    
+    def colourKingInCheck(self, colour):
+        
+        if colour == 1:
+            colourKing = self.whiteKing
+        else:
+            colourKing = self.blackKing
+           
+        capturables = self.getAllEnemyCapturableSquare(colour)
+        
+        if colourKing.position() in capturables:
+            return True
+        else:
+            return False
+        
 
 board1 = Board()
 
@@ -218,21 +233,15 @@ pieceCol = 5
 
 
 board1.printBoardTesting()
-turnColour = 1
+turnColour = 1 #put into board class as variable, change when move is made *=-1
 while True:
     #print(board1.whitePieces)
     #print(board1.blackPieces)
     if board1.getNumberOfMoves(turnColour) == 0:
-        if not board1.colourKingInCheck:
-            #checkmate
+        if board1.colourKingInCheck(turnColour):
+            print("checkmate")
         else:
-            #stalemate
-    
-    #check for checkmate and stalemate: 
-    #if len(board1.whitePieces.move) == 0: print("Black Checkmate")
-    
-    
-    #if len(board1.blackPieces) == 0: print("Black Checkmate")
+            print("Stalemate")
     
     if turnColour == 1:
         for piece in board1.whitePieces:
