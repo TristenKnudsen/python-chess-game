@@ -7,9 +7,9 @@ class Board:
        self.whitePieces = []
        self.blackPieces = []
        self.whiteKing = King(1, 0, 4)
-       self.blackKing = King(-1, 7, 4)
+       self.blackKing = King(-1, 3, 0)
        self.setupPieces()
-       #self.turnColour = 1
+       self.turnColour = 1
 
 
     def setupPieces(self):
@@ -17,11 +17,11 @@ class Board:
         #self.addPiece(Rook(1, 0, 0))
         #self.addPiece(Knight(1, 0, 1))
         #self.addPiece(Bishop(1, 0, 2))
-        self.addPiece(Queen(1, 0, 2))
+        self.addPiece(Queen(1, 1, 1))
         self.addPiece(self.whiteKing)
         #self.addPiece(Bishop(1, 0, 5))
         #self.addPiece(Knight(1, 0, 6))
-        self.addPiece(Rook(1, 6, 7))
+        self.addPiece(Rook(1, 7, 1))
         
         # Placing White Pawns
         #for col in range(8):
@@ -93,36 +93,39 @@ class Board:
         return moves
         
         
+    
+            
     def checkIfLegalMove(self, piece, eRow, eCol): #simulate the move on a copy of the board
-        kingCheckBoard = copy.deepcopy(self)
         pieceColour = piece.colour
         sRow = piece.row
         sCol = piece.col
+        #safe = True
         
-        if pieceColour == 1:
-            colourKing = kingCheckBoard.whiteKing
-        else:
-            colourKing = kingCheckBoard.blackKing
+        king = self.whiteKing if piece.colour == 1 else self.blackKing
+        
+        targetPiece = self.board[eRow][eCol]
+        if targetPiece:
+            (self.whitePieces if targetPiece.colour == 1 else self.blackPieces).remove(targetPiece)
+        
+        self.board[eRow][eCol] = self.board[sRow][sCol]
+        self.board[sRow][sCol] = None
+        piece.row = eRow
+        piece.col = eCol
+        
+        newCapturables = self.getAllEnemyCapturableSquare(king.colour)
+        kingPos = king.position()
+        legal = kingPos not in newCapturables 
             
-        faketarget_piece = kingCheckBoard.board[eRow][eCol]
-        if faketarget_piece:
-            if faketarget_piece.colour == 1:
-                kingCheckBoard.whitePieces.remove(faketarget_piece) 
-            else:
-                kingCheckBoard.blackPieces.remove(faketarget_piece)
+        self.board[sRow][sCol] = piece
+        self.board[eRow][eCol] = targetPiece if targetPiece else None
+        piece.row = sRow
+        piece.col = sCol
         
-        kingCheckBoard.board[eRow][eCol] = kingCheckBoard.board[sRow][sCol]
-        kingCheckBoard.board[sRow][sCol] = None
-        kingCheckBoard.board[eRow][eCol].row = eRow  
-        kingCheckBoard.board[eRow][eCol].col = eCol
+        if targetPiece:
+            (self.whitePieces if targetPiece.colour == 1 else self.blackPieces).append(targetPiece)
         
-        newCapturables = kingCheckBoard.getAllEnemyCapturableSquare(colourKing.colour)
-        kingPos = colourKing.position()
+        return legal
         
-        if kingPos in newCapturables:
-            return False
-        else:
-            return True
        
     def movePiece(self, piece, eRow, eCol):
         pieceColour = piece.colour
@@ -136,7 +139,7 @@ class Board:
                 pass
             else:
                 self.printBoardTesting()  
-                return print("Illegal move! King can be captured!")
+                return print("Illegal move! King in Check!")
         else:
             print("Castled",eCol)
             if eCol == "kingside":
@@ -186,6 +189,7 @@ class Board:
             else:
                 self.blackPieces.remove(target_piece)
         
+        self.turnColour *= -1
         self.executeMove(piece,eRow,eCol)
         #self.turnColour *= -1
     
@@ -197,7 +201,7 @@ class Board:
         piece.row = eRow  
         piece.col = eCol
         piece.hasMoved = True
-        self.printBoardTesting()  
+        self.printBoardTesting()
     
     def addPiece(self, piece):
         if piece.colour == 1:
@@ -229,10 +233,10 @@ pieceCol = 5
 
 
 board1.printBoardTesting()
-turnColour = 1 #put into board class as variable, change when move is made *=-1
+#turnColour = 1 #put into board class as variable, change when move is made *=-1
 while True:
-    #print(board1.whitePieces)
-    #print(board1.blackPieces)
+    turnColour = board1.turnColour
+    
     if board1.getNumberOfMoves(turnColour) == 0:
         if board1.colourKingInCheck(turnColour):
             print("checkmate")

@@ -130,7 +130,15 @@ class Pawn(Piece):
         moves.extend(validForward)
         moves.extend(validCaptures)
         moves.extend(validEnpassant)
-        return moves
+        
+        legalMoves = []
+        
+        for move in moves:
+            eRow, eCol = move
+            if board.checkIfLegalMove(self, eRow, eCol):
+                legalMoves.append(move)
+        
+        return legalMoves
         
 class King(Piece):
     def __init__(self, colour: str, row: int ,col: int):
