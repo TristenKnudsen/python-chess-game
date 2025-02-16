@@ -14,29 +14,29 @@ class Board:
 
     def setupPieces(self):
         # Setting up White pieces
-        self.addPiece(1, Rook(1, 0, 0))
-        #self.addPiece(1, Knight(1, 0, 1))
-        #self.addPiece(1, Bishop(1, 0, 2))
-        self.addPiece(1, Queen(1, 0, 2))
-        self.addPiece(1, self.whiteKing)
-        #self.addPiece(1, Bishop(1, 0, 5))
-        #self.addPiece(1, Knight(1, 0, 6))
-        self.addPiece(1, Rook(1, 6, 7))
+        #self.addPiece(Rook(1, 0, 0))
+        #self.addPiece(Knight(1, 0, 1))
+        #self.addPiece(Bishop(1, 0, 2))
+        self.addPiece(Queen(1, 0, 2))
+        self.addPiece(self.whiteKing)
+        #self.addPiece(Bishop(1, 0, 5))
+        #self.addPiece(Knight(1, 0, 6))
+        self.addPiece(Rook(1, 6, 7))
         
         # Placing White Pawns
         #for col in range(8):
         #    self.addPiece(1, Pawn(1, 1, col))
-        self.addPiece(1, Pawn(1, 6, 0))
+        self.addPiece(Pawn(-1, 1, 0))
         
         # Setting up Black pieces
-        #self.addPiece(-1, Rook(-1, 7, 0))
-        #self.addPiece(-1, Knight(-1, 7, 1))
-        #self.addPiece(-1, Bishop(-1, 7, 2))
-        #self.addPiece(-1, Queen(-1, 7, 3))
-        self.addPiece(-1, self.blackKing)
-        #self.addPiece(-1, Bishop(-1, 7, 5))
-        #self.addPiece(-1, Knight(-1, 7, 6))
-        #self.addPiece(-1, Rook(-1, 7, 7))
+        #self.addPiece(Rook(-1, 7, 0))
+        #self.addPiece(Knight(-1, 7, 1))
+        #self.addPiece(Bishop(-1, 7, 2))
+        #self.addPiece(Queen(-1, 7, 3))
+        self.addPiece(self.blackKing)
+        #self.addPiece(Bishop(-1, 7, 5))
+        #self.addPiece(Knight(-1, 7, 6))
+        #self.addPiece(Rook(-1, 7, 7))
         
         # Placing Black Pawns
         #for col in range(8):
@@ -92,8 +92,6 @@ class Board:
             
         return moves
         
-    def inBounds(row, col): #returns bool
-        return 0 <= row <= 7 and 0 <= col <= 7
         
     def checkIfLegalMove(self, piece, eRow, eCol): #simulate the move on a copy of the board
         kingCheckBoard = copy.deepcopy(self)
@@ -179,8 +177,6 @@ class Board:
                 pieceList.append(piece)
             
             
-            #if white promote on row = 7
-            #if black promote on row = 0
         
         
         target_piece = self.board[eRow][eCol] #pawns remove themself from the pieces
@@ -203,10 +199,10 @@ class Board:
         piece.hasMoved = True
         self.printBoardTesting()  
     
-    def addPiece(self,colour,piece):
-        if colour == 1:
+    def addPiece(self, piece):
+        if piece.colour == 1:
             self.whitePieces.append(piece)
-        elif colour == -1:
+        else:
             self.blackPieces.append(piece)
             
         self.board[piece.row][piece.col] = piece
