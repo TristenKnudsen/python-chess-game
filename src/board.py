@@ -7,40 +7,42 @@ class Board:
        self.whitePieces = []
        self.blackPieces = []
        self.whiteKing = King(1, 0, 4)
-       self.blackKing = King(-1, 3, 0)
+       self.blackKing = King(-1, 7, 4)
        self.setupPieces()
        self.turnColour = 1
 
 
     def setupPieces(self):
+        setupColour = 1
         # Setting up White pieces
-        #self.addPiece(Rook(1, 0, 0))
+        self.addPiece(Rook(1, 0, 0))
         #self.addPiece(Knight(1, 0, 1))
         #self.addPiece(Bishop(1, 0, 2))
-        self.addPiece(Queen(1, 1, 1))
+        #self.addPiece(Queen(1, 0, 3))
         self.addPiece(self.whiteKing)
         #self.addPiece(Bishop(1, 0, 5))
         #self.addPiece(Knight(1, 0, 6))
-        self.addPiece(Rook(1, 7, 1))
+        self.addPiece(Rook(1, 0, 7))
         
         # Placing White Pawns
         #for col in range(8):
-        #    self.addPiece(1, Pawn(1, 1, col))
-        self.addPiece(Pawn(-1, 1, 0))
+        #    self.addPiece(Pawn(1, 1, col))
+        self.addPiece(Pawn(1, 4, 4))
         
         # Setting up Black pieces
-        #self.addPiece(Rook(-1, 7, 0))
-        #self.addPiece(Knight(-1, 7, 1))
-        #self.addPiece(Bishop(-1, 7, 2))
-        #self.addPiece(Queen(-1, 7, 3))
+        self.addPiece(Rook(-1, 7, 0))
+        self.addPiece(Knight(-1, 7, 1))
+        self.addPiece(Bishop(-1, 7, 2))
+        self.addPiece(Queen(-1, 6, 4))
         self.addPiece(self.blackKing)
-        #self.addPiece(Bishop(-1, 7, 5))
-        #self.addPiece(Knight(-1, 7, 6))
-        #self.addPiece(Rook(-1, 7, 7))
+        self.addPiece(Bishop(-1, 7, 5))
+        self.addPiece(Knight(-1, 7, 6))
+        self.addPiece(Rook(-1, 7, 7))
         
         # Placing Black Pawns
         #for col in range(8):
-        #    self.addPiece(-1, Pawn(-1, 6, col))
+        #    self.addPiece(Pawn(-1, 6, col))
+        self.addPiece(Pawn(-1, 6, 5))
 
         
     def printBoardBlack(self):
@@ -55,7 +57,7 @@ class Board:
             print(f"{9 - row_num} {' '.join(formattedRow)}")        
         print("  a b c d e f g h")   
     
-    def printBoardTesting(self):
+    def printBoardTesting(self): #testing function
         for row_num, c in enumerate(self.board[::-1], start=1): 
             formattedRow = [str(piece) if piece else "." for piece in c]
             print(f"{8 - row_num} {' '.join(formattedRow)}")        
@@ -103,7 +105,7 @@ class Board:
         
         king = self.whiteKing if piece.colour == 1 else self.blackKing
         
-        targetPiece = self.board[eRow][eCol]
+        targetPiece = self.board[eRow][eCol] #EN PASSANT!!!!!!!! Somehow this doesnt matter though?
         if targetPiece:
             (self.whitePieces if targetPiece.colour == 1 else self.blackPieces).remove(targetPiece)
         
@@ -134,22 +136,22 @@ class Board:
         
         
         
-        if eRow != "castle": #only king can have eRow "Castle"
+        if eRow != "O": #only king can have eRow "Castle"
             if self.checkIfLegalMove(piece, eRow,eCol):
                 pass
             else:
-                self.printBoardTesting()  
+                #self.printBoardTesting()  
                 return print("Illegal move! King in Check!")
         else:
             print("Castled",eCol)
-            if eCol == "kingside":
+            if eCol == "O":
                 eRow , eCol = piece.row,6 #KING move square and row col
                 self.executeMove(piece, eRow, eCol)
                 
                 #MOVE ROOK
                 self.executeMove(self.board[eRow][7], eRow, 5)
                 return
-            if eCol == "queenside":
+            if eCol == "O-O":
                 eRow , eCol = piece.row,2 #KING move square and row col
                 self.executeMove(piece, eRow, eCol)
                 
@@ -161,14 +163,13 @@ class Board:
             print("moving piece is pawn")
             if [sRow + piece.colour, eCol] in piece.enPassantCaptures(self): 
                 print("Move is enpassant move")
-                #enPassantVictimPawn = self.board[sRow][eCol]
                 self.board[piece.row][eCol] = None #remove enpassant pawn
                 self.executeMove(piece, eRow, eCol)
                 return
-                  # Remove captured pawn
+                # Remove captured pawn
             if(2 - abs(sRow - eRow)  == 0):
                 piece.potentialenPassant = True
-            if eRow == 3.5 * (1 + piece.colour):
+            if eRow == 3.5 * (1 + piece.colour): #Pawn promote
                 #promote pawn
                 promoteTo = input("PROMOTE PAWN: Queen, Rook, Bishop, Knight")
                 pieceList = self.whitePieces if piece.colour == 1 else self.blackPieces
@@ -191,7 +192,6 @@ class Board:
         
         self.turnColour *= -1
         self.executeMove(piece,eRow,eCol)
-        #self.turnColour *= -1
     
     def executeMove(self, piece, eRow, eCol):
         sRow = piece.row
@@ -201,7 +201,7 @@ class Board:
         piece.row = eRow  
         piece.col = eCol
         piece.hasMoved = True
-        self.printBoardTesting()
+        #self.printBoardTesting()
     
     def addPiece(self, piece):
         if piece.colour == 1:
@@ -230,9 +230,21 @@ board1 = Board()
 
 pieceRow = 0
 pieceCol = 5
-
-
-board1.printBoardTesting()
+colParse = {
+          "a": 0,
+          "b": 1,
+          "c": 2,
+          "d": 3,
+          "e": 4,
+          "f": 5,
+          "g": 6,
+          "h": 7
+        }
+        
+def inverse_mapping(f):
+    return f.__class__(map(reversed, f.items()))   
+#new move system by selecting piece by col and row e2 and then moving to the accociated places
+#board1.printBoardTesting()
 #turnColour = 1 #put into board class as variable, change when move is made *=-1
 while True:
     turnColour = board1.turnColour
@@ -244,17 +256,22 @@ while True:
             print("Stalemate")
     
     if turnColour == 1:
+        board1.printBoardWhite()
         for piece in board1.whitePieces:
             if isinstance(piece, Pawn):
                     piece.potentialenPassant = False
     else:
-        
+        board1.printBoardBlack()
         for piece in board1.blackPieces:
                 if isinstance(piece, Pawn):
                         piece.potentialenPassant = False
     
     board1.blackKing.checkCastleMoves(board1)
-    sRow, sCol = list(map(int,(input("Enter Piece coor: ").split(","))))
+    sCol, sRow = (input("Enter Piece coor: "))[:2]
+    sRow = int(sRow) - 1
+    sCol = colParse[sCol]
+    
+    
     piece = board1.getPiece(sRow,sCol)
     if piece is None:
         print("There is no piece on that square!")
@@ -265,7 +282,11 @@ while True:
     else:
         q = 0
         for move in piece.moves(board1):
-            print(str(q) + ":" + str(move))
+            row,col = move
+            if row == "O":
+                print(str(q) + ":" + row + "-" + col)
+            else:
+                print(str(q) + ":" + str(inverse_mapping(colParse)[col]) + str(int(row) + 1))
             q += 1
             
         while True:
@@ -275,6 +296,8 @@ while True:
             except ValueError or IndexError:
                 print("Invalid input. Please enter a valid integer.")
         eRow,eCol = piece.moves(board1)[userMoveNumber]
+        
+        
         board1.movePiece(piece,eRow,eCol)
         turnColour *= -1
         
