@@ -245,12 +245,12 @@ class Knight(Piece):
         capturables = []
         currentRow = self.row
         currentCol = self.col
-        knight_moves = [
+        knightMoves = [
             (-2, -1), (-2, 1), (2, -1), (2, 1),  # Moves with 2-row jump
             (-1, -2), (-1, 2), (1, -2), (1, 2)   # Moves with 2-column jump
         ]
 
-        for dr, dc in knight_moves:
+        for dr, dc in knightMoves:
             newRow = currentRow + dr
             newCol = currentCol + dc
 
