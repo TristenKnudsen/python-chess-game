@@ -25,7 +25,6 @@ class Game():
                     return row, col
             print("Invalid coordinate. Please enter a value like e2.")
 
-        
     def run(self):
         while True:
             turnColour = self.board.turnColour
@@ -34,9 +33,11 @@ class Game():
             
             if self.board.getNumberOfMoves(turnColour) == 0:
                 if self.board.colourKingInCheck(turnColour):
-                    print("checkmate")
+                    print("Checkmate")
+                    break
                 else:
                     print("Stalemate")
+                    break
                     
             
             if turnColour == 1:
@@ -49,8 +50,7 @@ class Game():
                                 piece.potentialenPassant = False
             
             self.board.blackKing.checkCastleMoves(self.board) 
-            sRow, sCol = self.promptForCoordinate("Enter piece coor as row col (ex. e4)")
-            
+            sRow, sCol = self.promptForCoordinate("Enter piece coordinate: ")
             
             piece = self.board.getPiece(sRow,sCol)
             if piece is None:
@@ -86,4 +86,5 @@ game = Game()
 game.run()
 print("Game Started")
 
-#might change moves to work like normal chess and then use a dictionary
+#might change moves to work like normal chess and then use dictionary, but im done with this project
+#Might try another with proper bits 

@@ -82,10 +82,14 @@ class Pawn(Piece):
         return validCaptures
 
     def enPassantCaptures(self, board): #Returns actual squares a pawn could capture
-        enPassant = [
-            [self.row,self.col + 1],
-            [self.row,self.col - 1]
-        ]
+        enPassant = []
+        for direction in [1, -1]:
+            newCol = self.col + direction
+
+            if newCol < 0 or newCol >= 8:
+                continue
+
+            enPassant.append([self.row, newCol])
         validEnpassant=[]
         
         for capture in enPassant:
